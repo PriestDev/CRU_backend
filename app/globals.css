@@ -10,6 +10,7 @@
   --primary: #137FEC;
   --ash: #94A3B8;
   --appRed: #DC2626;
+  --stroke: #CBD5E1;
 }
 
 /* Force the body tag to use the Tailwind sans font utility */
