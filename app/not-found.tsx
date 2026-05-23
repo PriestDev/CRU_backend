@@ -2,12 +2,13 @@
 
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Button from '@/components/ui/button';
 
 export default function NotFound() {
   const router = useRouter()
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-6 py-8 text-center bg-white">
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-8 text-center bg-white">
       {/* Illustration */}
       <svg
         className="mb-8 opacity-15"
@@ -54,19 +55,14 @@ export default function NotFound() {
       </p>
 
       {/* Actions */}
-      <div className="flex flex-col gap-3 w-full max-w-70">
+      <div className="flex flex-col gap-3 w-full">
         <Link
           href="/"
-          className="w-full flex items-center justify-center gap-2 py-3 px-7 rounded-xl text-sm font-medium text-white transition-opacity hover:opacity-90 bg-(--primary)"
+          className="w-full flex items-center justify-center gap-2 p-3.5 rounded-xl font-bold text-white transition-opacity hover:opacity-90 bg-(--primary) text-lg"
         >
-          ← Go home
+          Go home
         </Link>
-        <button
-          onClick={() => router.back()}
-          className="w-full py-3 px-7 rounded-xl text-sm font-medium text-gray-500 border border-gray-200 hover:bg-gray-50 transition-colors"
-        >
-          Go back
-        </button>
+        <Button text="Go back" type='button' className='text-(--ash) border border-(--ash)' onClick={() => router.back()} />
       </div>
     </div>
   );
