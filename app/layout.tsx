@@ -9,7 +9,8 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "Campus Ride",
-  description: "Seamless ride booking, package delivery, and carpooling for uniport campus.",
+  description:
+    "Seamless ride booking, package delivery, and carpooling for uniport campus.",
 };
 
 export default function RootLayout({
@@ -18,11 +19,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${inter.variable} h-full antialiased`}
-    >
-      <body className=" font-sans min-h-screen flex flex-col">{children}</body>
+    <html lang="en" className={`${inter.variable} h-full antialiased`}>
+      <body className=" font-sans min-h-screen flex flex-col">
+        <div className="hidden sm:flex min-h-screen items-center justify-center">Please view on mobile</div>
+        <div className="sm:hidden">{children}</div>
+      </body>
     </html>
   );
 }
