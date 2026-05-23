@@ -5,7 +5,7 @@
 }
 
 :root {
-  --background: #64748B;
+  --background: #F6F7F8;
   --dark-text: #0F172A;
   --primary: #137FEC;
   --ash: #94A3B8;
@@ -15,4 +15,5 @@
 /* Force the body tag to use the Tailwind sans font utility */
 body {
   @apply font-sans;
+  color: var(--dark-text)
 }
