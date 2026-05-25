@@ -4,7 +4,7 @@ import HeroImage from "../../../../assets/staff.png";
 import Image from "next/image";
 import { useState } from "react";
 import { FaEyeSlash, FaEye } from "react-icons/fa6";
-import Link from 'next/link'
+import Link from "next/link";
 import Button from "@/components/ui/button";
 
 const page = () => {
@@ -21,7 +21,7 @@ const page = () => {
 
       <div className="px-4 py-3 space-y-10">
         <div className="space-y-2">
-          <h4 className="text-3xl font-bold">Student Login</h4>
+          <h4 className="text-xl font-bold">Student Login</h4>
           <p className=" text-(--ash)">
             Welcome back! Please enter your details.
           </p>

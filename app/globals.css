@@ -17,5 +17,5 @@
 body {
   @apply font-sans;
   color: var(--dark-text);
-  font-size: 14px;
+  font-size: 12px;
 }

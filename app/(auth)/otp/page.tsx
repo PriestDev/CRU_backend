@@ -2,11 +2,11 @@
 
 import Button from "@/components/ui/button";
 import React, { useState, useEffect, useRef } from "react";
-import { useRouter } from 'next/navigation'
-import PageHeader from '@/components/layout/pageHeader'
+import { useRouter } from "next/navigation";
+import PageHeader from "@/components/layout/pageHeader";
 
 export default function OtpPage() {
-  const router = useRouter()
+  const router = useRouter();
   // 1. Component State
   const [otp, setOtp] = useState<string[]>(new Array(6).fill(""));
   const [timeLeft, setTimeLeft] = useState<number>(59);
@@ -98,7 +98,7 @@ export default function OtpPage() {
       <PageHeader text="OTP Verification" />
       <div className="p-4 space-y-10 max-w-md mx-auto">
         <div className="space-y-2">
-          <h4 className="text-3xl font-bold">Verify your email</h4>
+          <h4 className="text-xl font-bold">Verify your email</h4>
           <p className="text-(--ash)">
             We've sent a 6-digit code to your email.
           </p>

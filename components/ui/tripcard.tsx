@@ -23,7 +23,7 @@ const tripcard = (props: tripProps) => {
         </div>
       </div>
       <div className="flex flex-col items-center">
-        <h4 className="font-bold text-xl">N{props.price}</h4>
+        <h4 className="font-bold text-lg">N{props.price}</h4>
         <p
           className={`text-xs rounded-lg p-1.5 px-2 capitalize ${props.status === "completed" ? "text-green-500 bg-green-100" : props.status === "cancelled" ? "text-red-500 bg-red-100" : "text-gray-500 bg-gray-100"}`}
         >

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState, ChangeEvent, FormEvent } from "react";
 import HeroImage from "../../../assets/staff.png";
 import Image from "next/image";
-import {useRouter} from "next/navigation"
+import { useRouter } from "next/navigation";
 import Button from "@/components/ui/button";
 
 type UserRole = "staff" | "student" | "visitor";
@@ -15,9 +15,9 @@ interface FormState {
 }
 
 const page = () => {
-  const router = useRouter()
+  const router = useRouter();
   const [loginModal, setLoginModal] = useState(false);
-  const [loginRole, setLoginRole] = useState<UserRole>("student")
+  const [loginRole, setLoginRole] = useState<UserRole>("student");
   const [form, setForm] = useState<FormState>({
     email: "",
     userRole: "student",
@@ -41,7 +41,7 @@ const page = () => {
       </div>
       <div className="px-4 py-3 space-y-10">
         <div className="space-y-2">
-          <h4 className="text-3xl font-bold">Create account</h4>
+          <h4 className="text-xl font-bold">Create account</h4>
           <p className="text-(--ash)">
             Safe transit for the university community
           </p>
@@ -91,7 +91,12 @@ const page = () => {
           </p>
 
           {/* Submit button */}
-          <Button text="Continue" type="submit" bgColor="primary" onClick={()=> router.push('/otp')}/>
+          <Button
+            text="Continue"
+            type="submit"
+            bgColor="primary"
+            onClick={() => router.push("/otp")}
+          />
         </form>
 
         {/* Log in text - Fixed to point directly to form.userRole */}

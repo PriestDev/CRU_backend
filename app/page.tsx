@@ -18,13 +18,18 @@ export default function Home() {
         className="p-15 pb-0"
       />
       <div className="space-y-3">
-        <h1 className="text-3xl font-bold text-center text-(--primary)">
+        <h1 className="text-xl font-bold text-center text-(--primary)">
           Welcome to Campus Ride
         </h1>
         <p className="text-center">
           The most reliable way to navigate you campus effortlessly and safely.
         </p>
-        <Button text="Get Started" type="button" onClick={() => router.push("/signup")} bgColor="primary" />
+        <Button
+          text="Get Started"
+          type="button"
+          onClick={() => router.push("/signup")}
+          bgColor="primary"
+        />
       </div>
     </main>
   );

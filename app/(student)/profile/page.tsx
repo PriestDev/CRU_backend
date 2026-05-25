@@ -21,8 +21,8 @@ const page = () => {
         />
       </div>
       <div className="p-4 space-y-4">
-        <div className="flex flex-col gap-2 items-center py-10">
-          <div className="h-45 w-45 rounded-full overflow-hidden flex items-center justify-center border-2.5 border-(--stroke) shadwow-xs">
+        <div className="flex flex-col gap-2 items-center py-4">
+          <div className="h-25 w-25 rounded-full overflow-hidden flex items-center justify-center border-2.5 border-(--stroke) shadwow-xs">
             <Image
               src="http://placehold.net/avatar-4.svg"
               alt="profile picture"
@@ -30,8 +30,8 @@ const page = () => {
               height={200}
             />
           </div>
-          <div>
-            <h4 className="text-xl font-bold">Alex Johnson</h4>
+          <div className="text-center">
+            <h4 className="text-lg font-bold">Alex Johnson</h4>
             <p className="text-(--ash)">Campus ID: 3020001</p>
           </div>
         </div>
