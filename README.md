@@ -93,10 +93,10 @@ backend/
 ### Health Check
 - `GET /api/v1/health` - Check API status
 
-### Authentication (TODO)
-- `POST /api/v1/auth/signup` - User registration
-- `POST /api/v1/auth/login` - User login
-- `POST /api/v1/auth/refresh` - Refresh token
+### Authentication
+- `POST /api/v1/auth/signup` - User registration (email & role)
+- `POST /api/v1/auth/verify-otp` - Verify OTP code
+- `POST /api/v1/auth/resend-otp` - Resend OTP to email
 
 ### Users (TODO)
 - `GET /api/v1/users/:id` - Get user profile
@@ -122,18 +122,24 @@ backend/
 |----------|-------------|---------|
 | `PORT` | Server port | `5000` |
 | `NODE_ENV` | Environment | `development` |
-| `MONGODB_URI` | MongoDB connection string | `mongodb://localhost:27017/db` |
+| `DB_HOST` | MySQL host | `localhost` |
+| `DB_USER` | MySQL username | `root` |
+| `DB_PASSWORD` | MySQL password | `password` |
+| `DB_NAME` | Database name | `campus_ride_uniport` |
+| `DB_PORT` | MySQL port | `3306` |
 | `JWT_SECRET` | JWT signing secret | `your_secret_key` |
+| `JWT_EXPIRY` | JWT expiration time | `24h` |
 | `CORS_ORIGIN` | Allowed CORS origin | `http://localhost:3000` |
 
 ## 📦 Dependencies
 
 - **express** - Web framework
-- **mongoose** - MongoDB ODM
+- **mysql2** - MySQL database driver with connection pooling
 - **cors** - CORS middleware
 - **jsonwebtoken** - JWT authentication
 - **bcryptjs** - Password hashing
 - **dotenv** - Environment variables
+- **validator** - Input validation
 
 ## 🛠️ Development Dependencies
 
