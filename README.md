@@ -6,7 +6,7 @@ Node.js/Express REST API backend for the Campus Ride Uniport application.
 
 - Express.js REST API
 - TypeScript for type safety
-- MongoDB integration with Mongoose
+- MySQL database with connection pooling
 - JWT Authentication
 - CORS enabled
 - Error handling middleware
@@ -17,7 +17,7 @@ Node.js/Express REST API backend for the Campus Ride Uniport application.
 ### Prerequisites
 
 - Node.js 16+
-- MongoDB 4.4+
+- MySQL 5.7+
 - npm or yarn
 
 ### Installation
@@ -35,9 +35,15 @@ Node.js/Express REST API backend for the Campus Ride Uniport application.
 3. Update `.env` with your configuration:
    ```env
    PORT=5000
-   MONGODB_URI=mongodb://localhost:27017/campus-ride-uniport
-   JWT_SECRET=your_secret_key
+   DB_HOST=localhost
+   DB_USER=root
+   DB_PASSWORD=your_password
+   DB_NAME=campus_ride_uniport
+   DB_PORT=3306
+   NODE_ENV=development
    CORS_ORIGIN=http://localhost:3000
+   JWT_SECRET=your_secret_key
+   JWT_EXPIRY=24h
    ```
 
 ### Development
@@ -71,10 +77,11 @@ backend/
 │   ├── server.ts           # Entry point
 │   ├── routes/             # API routes
 │   ├── controllers/        # Route controllers
-│   ├── models/             # MongoDB models
+│   ├── config/             # Configuration files
+│   │   ├── database.ts     # MySQL connection pool
+│   │   └── schema.ts       # Database schema initialization
 │   ├── middleware/         # Custom middleware
 │   ├── utils/              # Utility functions
-│   └── config/             # Configuration files
 ├── dist/                   # Compiled JavaScript
 ├── .env.example           # Environment variables template
 ├── package.json           # Dependencies
