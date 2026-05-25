@@ -2,7 +2,7 @@ import { tripProps } from "@/app/(student)/data";
 
 const tripcard = (props: tripProps) => {
   return (
-    <div className="flex items-center justify-between p-4 bg-white rounded-lg border border-(--ash)/10 shadow-xs">
+    <div className="flex items-center justify-between gap-2 p-4 bg-white rounded-lg border border-(--ash)/10 shadow-xs">
       <div className="flex items-center gap-2">
         <div className="text-(--primary) bg-(--primary)/10 rounded-lg flex items-center justify-center w-12 h-12">
           {props.type === "ride" ? (
@@ -14,10 +14,10 @@ const tripcard = (props: tripProps) => {
           )}
         </div>
         <div>
-          <h4 className="font-bold">
+          <h4 className="font-bold line-clamp-1">
             {props.from} - {props.to}
           </h4>
-          <p className="text-sm text-(--ash)">
+          <p className="text-sm text-(--ash) line-clamp-1">
             {props.date} ▪️ {props.time}
           </p>
         </div>

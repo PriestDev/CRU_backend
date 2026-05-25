@@ -25,7 +25,7 @@ const page = () => {
         />
       </div>
 
-      <div className="border-b border-(--stroke) px-4 text-(--ash) flex gap-8">
+      <div className="border-b border-(--stroke) px-4 text-(--ash) flex gap-5">
         <button
           className={`py-4 ${section === "all" ? "border-b-2 border-(--primary) font-bold text-(--primary)" : ""}`}
           onClick={() => setSection("all")}

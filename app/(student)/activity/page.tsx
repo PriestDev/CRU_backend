@@ -35,8 +35,8 @@ const page = () => {
       </div>
       <div className="p-4 space-y-4">
         <div className="flex items-center justify-between">
-          <h4 className="text-2xl font-bold">Recent Trips</h4>
-          <Link href="/activity" className="text-(--primary) font-bold text-lg">
+          <h4 className="text-xl font-bold">Recent Trips</h4>
+          <Link href="/activity" className="text-(--primary) font-bold">
             Filter
           </Link>
         </div>

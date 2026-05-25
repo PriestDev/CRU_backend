@@ -22,7 +22,7 @@ const Button = ({ text, onClick, type, bgColor, className }: buttonProps) => {
     <button
       type={type}
       // Removed hardcoded text sizes/colors so your custom className works
-      className={`rounded-xl w-full font-bold transition-colors p-3.5 text-lg ${selectedBg} ${className || ""}`}
+      className={`rounded-xl w-full font-bold transition-colors p-3.5 ${selectedBg} ${className || ""}`}
       onClick={onClick}
     >
       {text}

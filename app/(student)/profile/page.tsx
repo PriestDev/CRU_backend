@@ -31,7 +31,7 @@ const page = () => {
             />
           </div>
           <div>
-            <h4 className="text-2xl font-bold">Alex Johnson</h4>
+            <h4 className="text-xl font-bold">Alex Johnson</h4>
             <p className="text-(--ash)">Campus ID: 3020001</p>
           </div>
         </div>

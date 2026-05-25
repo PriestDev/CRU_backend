@@ -3,7 +3,7 @@ import { NotificationProps } from "@/app/(student)/data";
 const alertcard = (props: NotificationProps) => {
   return (
     <div
-      className={`flex justify-between gap-5 border-b border-(--stroke) p-4 ${props.isRead ? "bg-white" : "bg-(--primary)/10"}`}
+      className={`flex justify-between gap-2 border-b border-(--stroke) p-4 ${props.isRead ? "bg-white" : "bg-(--primary)/10"}`}
     >
       <div className="flex gap-2">
         <div
@@ -38,7 +38,7 @@ const alertcard = (props: NotificationProps) => {
           </span>
         </div>
         <div>
-          <p className="font-semibold truncate">{props.title}</p>
+          <p className="font-semibold line-clamp-1">{props.title}</p>
           <p className="text-(--ash) line-clamp-2">{props.message}</p>
         </div>
       </div>

@@ -41,7 +41,7 @@ export const trips: tripProps[] = [
   {
     from: "Delta Park",
     to: "Choba",
-    date: "2026-05-26",
+    date: "26-05-26",
     time: "08:00 AM",
     status: "upcoming",
     type: "ride",
@@ -50,7 +50,7 @@ export const trips: tripProps[] = [
   {
     from: "Abuja Campus",
     to: "Alakahia",
-    date: "2026-05-24",
+    date: "26-05-24",
     time: "06:30 PM",
     status: "completed",
     type: "delivery",
@@ -59,7 +59,7 @@ export const trips: tripProps[] = [
   {
     from: "Choba",
     to: "Uniport Main Gate",
-    date: "2026-05-27",
+    date: "26-05-27",
     time: "09:15 AM",
     status: "upcoming",
     type: "carpool",
@@ -68,7 +68,7 @@ export const trips: tripProps[] = [
   {
     from: "Aluu",
     to: "Delta Park",
-    date: "2026-05-22",
+    date: "26-05-22",
     time: "04:45 PM",
     status: "completed",
     type: "ride",
@@ -77,7 +77,7 @@ export const trips: tripProps[] = [
   {
     from: "Uniport Main Gate",
     to: "Alakahia",
-    date: "2026-05-28",
+    date: "26-05-28",
     time: "07:20 AM",
     status: "upcoming",
     type: "delivery",
@@ -86,7 +86,7 @@ export const trips: tripProps[] = [
   {
     from: "Delta Park",
     to: "Abuja Campus",
-    date: "2026-05-20",
+    date: "26-05-20",
     time: "01:00 PM",
     status: "cancelled",
     type: "carpool",
@@ -95,7 +95,7 @@ export const trips: tripProps[] = [
   {
     from: "Choba",
     to: "Aluu",
-    date: "2026-05-29",
+    date: "26-05-29",
     time: "05:30 PM",
     status: "upcoming",
     type: "ride",
@@ -104,7 +104,7 @@ export const trips: tripProps[] = [
   {
     from: "Alakahia",
     to: "Delta Park",
-    date: "2026-05-23",
+    date: "26-05-23",
     time: "10:10 AM",
     status: "completed",
     type: "delivery",
@@ -113,7 +113,7 @@ export const trips: tripProps[] = [
   {
     from: "Abuja Campus",
     to: "Uniport Main Gate",
-    date: "2026-05-30",
+    date: "26-05-30",
     time: "03:40 PM",
     status: "upcoming",
     type: "carpool",
@@ -122,7 +122,7 @@ export const trips: tripProps[] = [
   {
     from: "Aluu",
     to: "Choba",
-    date: "2026-05-21",
+    date: "26-05-21",
     time: "11:50 AM",
     status: "cancelled",
     type: "ride",
@@ -131,7 +131,7 @@ export const trips: tripProps[] = [
   {
     from: "Delta Park",
     to: "Alakahia",
-    date: "2026-06-01",
+    date: "26-06-01",
     time: "08:25 AM",
     status: "upcoming",
     type: "delivery",
@@ -140,7 +140,7 @@ export const trips: tripProps[] = [
   {
     from: "Uniport Main Gate",
     to: "Abuja Campus",
-    date: "2026-05-25",
+    date: "26-05-25",
     time: "02:15 PM",
     status: "completed",
     type: "carpool",

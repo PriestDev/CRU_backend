@@ -15,8 +15,8 @@ const profilecard = (props: ProfileCardProps) => {
                 <span className="material-symbols-outlined">{props.icon}</span>
             </div>
             <div>
-                <h4 className="font-bold text-lg">{props.title}</h4>
-                <p className="text-(--ash) text-sm">{props.text}</p>
+                <h4 className="font-bold text-base">{props.title}</h4>
+                <p className="text-(--ash) text-xs">{props.text}</p>
             </div>
         </div>
         <div>

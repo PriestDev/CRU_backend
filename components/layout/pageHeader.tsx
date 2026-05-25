@@ -10,7 +10,7 @@ type headerProps = {
 const pageHeader = ({text, extra}: headerProps) => {
   const router = useRouter()
   return (
-    <div className="flex items-center justify-between p-4 py-8">
+    <div className="flex items-center justify-between p-4 py-4">
       <FaArrowLeft onClick={() => router.back()} className=' text-xl'/>
       <h4 className="font-bold text-xl">{text}</h4>
       <div>{extra}</div>

@@ -30,26 +30,26 @@ const page = () => {
             </div>
           </div>
           {/* carpooling CTA */}
-          <section className="bg-(--primary) p-6 rounded-xl text-white space-y-3">
-            <h4 className=" font-bold text-2xl">Save with Carpooling</h4>
+          <section className="bg-(--primary) p-6 rounded-xl text-white space-y-2">
+            <h4 className=" font-bold text-xl">Save with Carpooling</h4>
             <p className=" text-white/80">
               Share your commute with fellow students and split the costs.
             </p>
-            <button className="bg-white text-(--primary) text-lg font-bold p-4 py-2 rounded-lg">
+            <button className="bg-white text-(--primary) font-bold p-4 py-2 rounded-lg">
               <Link href="/carpool">Start Saving</Link>
             </button>
           </section>
         </section>
         {/* services section */}
         <section className=" space-y-4">
-          <h4 className="text-2xl font-bold">Shuttle Services</h4>
+          <h4 className="text-xl font-bold">Shuttle Services</h4>
           <div className="grid grid-cols-4 gap-10">
             {services.map((service, index) => (
               <Link href={service.link} key={index} className="flex flex-col gap-1.5 items-center">
                 <div className="text-(--primary) bg-(--primary)/10 w-15 h-15 rounded-2xl  flex items-center justify-center">
                   {service.icon}
                 </div>
-                <p className="font-semibold text-nowrap text-sm">
+                <p className="font-semibold text-nowrap">
                   {service.name}
                 </p>
               </Link>
@@ -59,8 +59,8 @@ const page = () => {
         {/* recent trips */}
         <section>
           <div className="flex items-center justify-between py-4">
-            <h4 className="text-2xl font-bold">Recent Trips</h4>
-            <Link href="/activity" className="text-(--primary) font-bold text-lg">See all</Link>
+            <h4 className="text-xl font-bold">Recent Trips</h4>
+            <Link href="/activity" className="text-(--primary) font-bold">See all</Link>
           </div>
           <div className="space-y-4">
             {displayedTrips.map((trip, index) => (
