@@ -94,9 +94,9 @@ backend/
 - `GET /api/v1/health` - Check API status
 
 ### Authentication
-- `POST /api/v1/auth/signup` - User registration (email & role)
-- `POST /api/v1/auth/verify-otp` - Verify OTP code
-- `POST /api/v1/auth/resend-otp` - Resend OTP to email
+- `POST /api/v1/auth/signup` - User registration with email and role
+- `POST /api/v1/auth/verify-otp` - Verify OTP for email confirmation
+- `POST /api/v1/auth/resend-otp` - Resend OTP to user email
 
 ### Users (TODO)
 - `GET /api/v1/users/:id` - Get user profile
@@ -123,8 +123,8 @@ backend/
 | `PORT` | Server port | `5000` |
 | `NODE_ENV` | Environment | `development` |
 | `DB_HOST` | MySQL host | `localhost` |
-| `DB_USER` | MySQL username | `root` |
-| `DB_PASSWORD` | MySQL password | `password` |
+| `DB_USER` | MySQL user | `root` |
+| `DB_PASSWORD` | MySQL password | `your_password` |
 | `DB_NAME` | Database name | `campus_ride_uniport` |
 | `DB_PORT` | MySQL port | `3306` |
 | `JWT_SECRET` | JWT signing secret | `your_secret_key` |
@@ -138,8 +138,8 @@ backend/
 - **cors** - CORS middleware
 - **jsonwebtoken** - JWT authentication
 - **bcryptjs** - Password hashing
-- **dotenv** - Environment variables
 - **validator** - Input validation
+- **dotenv** - Environment variables
 
 ## 🛠️ Development Dependencies
 
