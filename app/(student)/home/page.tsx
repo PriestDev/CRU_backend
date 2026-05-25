@@ -26,7 +26,7 @@ const page = () => {
               <span className="material-symbols-outlined text-(--primary)">
                 search
               </span>
-              <input type="text" placeholder="Where to?" />
+              <input type="text" placeholder="Where to?" className="w-full focus:outline-0 focus:border-0" />
             </div>
           </div>
           {/* carpooling CTA */}
