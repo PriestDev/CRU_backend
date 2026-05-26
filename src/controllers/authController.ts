@@ -1,9 +1,34 @@
 import { Request, Response } from 'express';
+import bcryptjs from 'bcryptjs';
+import crypto from 'crypto';
 import pool from '../config/database';
+import { sendOTPEmail, sendWelcomeEmail, sendPasswordResetEmail } from '../services/emailService';
 
 // Generate random OTP
 const generateOTP = (): string => {
   return Math.floor(100000 + Math.random() * 900000).toString();
+};
+
+// Generate random password
+const generatePassword = (): string => {
+  const length = 12;
+  const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const lowercase = 'abcdefghijklmnopqrstuvwxyz';
+  const numbers = '0123456789';
+  const symbols = '!@#$%^&*';
+  const allChars = uppercase + lowercase + numbers + symbols;
+  
+  let password = '';
+  password += uppercase[Math.floor(Math.random() * uppercase.length)];
+  password += lowercase[Math.floor(Math.random() * lowercase.length)];
+  password += numbers[Math.floor(Math.random() * numbers.length)];
+  password += symbols[Math.floor(Math.random() * symbols.length)];
+  
+  for (let i = 4; i < length; i++) {
+    password += allChars[Math.floor(Math.random() * allChars.length)];
+  }
+  
+  return password.split('').sort(() => Math.random() - 0.5).join('');
 };
 
 // Get client IP address
@@ -65,26 +90,47 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    // Generate OTP
+    // Generate OTP and Password
     const otp = generateOTP();
+    const password = generatePassword();
+    const passwordHash = await bcryptjs.hash(password, 10);
     const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
-    // Create user with OTP
-    await connection.execute(
-      'INSERT INTO users (email, role, verification_otp, otp_expiry, ip_address, is_verified) VALUES (?, ?, ?, ?, ?, false)',
-      [email, userRole, otp, otpExpiry, ipAddress]
+    // Create user with OTP and hashed password
+    const insertResult = await connection.execute(
+      'INSERT INTO users (email, role, password_hash, verification_otp, otp_expiry, ip_address, is_verified) VALUES (?, ?, ?, ?, ?, ?, false)',
+      [email, userRole, passwordHash, otp, otpExpiry, ipAddress]
     );
+    
+    console.log(`✅ User created successfully:`, {
+      email,
+      role: userRole,
+      insertResult: (insertResult as any)[0],
+    });
 
-    // TODO: Send OTP via email here
-    console.log(`OTP for ${email}: ${otp}`); // For development only
+    // Send OTP via email
+    const otpEmailSent = await sendOTPEmail({
+      email,
+      otp,
+      userRole,
+    });
+
+    // Send Welcome email with password
+    const welcomeEmailSent = await sendWelcomeEmail({
+      email,
+      password,
+      userRole,
+    });
 
     res.status(201).json({
       success: true,
-      message: 'User created successfully. Check your email for OTP.',
+      message: 'User created successfully. Check your email for OTP and temporary password.',
       data: {
         email,
         role: userRole,
         isVerified: false,
+        otpEmailSent,
+        welcomeEmailSent,
       },
     });
   } catch (error) {
@@ -233,8 +279,14 @@ export const resendOTP = async (req: Request, res: Response): Promise<void> => {
       [otp, otpExpiry, email]
     );
 
-    // TODO: Send OTP via email here
-    console.log(`New OTP for ${email}: ${otp}`); // For development only
+    // Send OTP via email
+    try {
+      await sendOTPEmail({ email, otp, userRole: user.role });
+      console.log(`✅ OTP resent successfully to ${email}`);
+    } catch (emailError) {
+      console.error('Error sending resend OTP email:', emailError);
+      // Still return success as OTP was generated and stored
+    }
 
     res.status(200).json({
       success: true,
@@ -245,6 +297,213 @@ export const resendOTP = async (req: Request, res: Response): Promise<void> => {
     res.status(500).json({
       success: false,
       message: 'An error occurred while resending OTP',
+      error: error instanceof Error ? error.message : 'Unknown error',
+    });
+  } finally {
+    connection.release();
+  }
+};
+
+// Login handler
+export const login = async (req: Request, res: Response): Promise<void> => {
+  const connection = await pool.getConnection();
+  
+  try {
+    const { email, password } = req.body;
+
+    // Validate inputs
+    if (!email || !password) {
+      res.status(400).json({
+        success: false,
+        message: 'Email and password are required',
+      });
+      return;
+    }
+
+    // Find user by email
+    const [users] = await connection.execute(
+      'SELECT * FROM users WHERE email = ?',
+      [email]
+    );
+
+    if (!Array.isArray(users) || users.length === 0) {
+      res.status(404).json({
+        success: false,
+        message: 'Email or password is incorrect',
+      });
+      return;
+    }
+
+    const user = users[0] as any;
+
+    // Check if user is verified
+    if (!user.is_verified) {
+      res.status(403).json({
+        success: false,
+        message: 'Please verify your email first',
+      });
+      return;
+    }
+
+    // Verify password
+    const isPasswordValid = await bcryptjs.compare(password, user.password_hash);
+    
+    if (!isPasswordValid) {
+      res.status(401).json({
+        success: false,
+        message: 'Email or password is incorrect',
+      });
+      return;
+    }
+
+    // Login successful
+    res.status(200).json({
+      success: true,
+      message: 'Login successful',
+      data: {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        isVerified: user.is_verified,
+      },
+    });
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'An error occurred during login',
+      error: error instanceof Error ? error.message : 'Unknown error',
+    });
+  } finally {
+    connection.release();
+  }
+};
+
+export const forgotPassword = async (req: Request, res: Response): Promise<void> => {
+  const connection = await pool.getConnection();
+  try {
+    const { email } = req.body;
+
+    // Validate input
+    if (!email || typeof email !== 'string') {
+      res.status(400).json({
+        success: false,
+        message: 'Email is required',
+      });
+      return;
+    }
+
+    // Check if user exists
+    const [users] = await connection.execute('SELECT id, email, role FROM users WHERE email = ?', [email]);
+
+    if (!Array.isArray(users) || users.length === 0) {
+      res.status(404).json({
+        success: false,
+        message: 'Email not found',
+      });
+      return;
+    }
+
+    const user = (users[0] as any);
+
+    // Generate reset token
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const resetTokenExpiry = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes
+
+    // Update user with reset token
+    await connection.execute('UPDATE users SET reset_token = ?, reset_token_expiry = ? WHERE id = ?', [
+      resetToken,
+      resetTokenExpiry,
+      user.id,
+    ]);
+
+    // Send password reset email
+    const emailSent = await sendPasswordResetEmail({
+      email,
+      resetToken,
+    });
+
+    if (!emailSent) {
+      res.status(500).json({
+        success: false,
+        message: 'Failed to send reset email. Please try again later.',
+      });
+      return;
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Password reset link sent to your email',
+    });
+  } catch (error) {
+    console.error('Forgot password error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'An error occurred',
+      error: error instanceof Error ? error.message : 'Unknown error',
+    });
+  } finally {
+    connection.release();
+  }
+};
+
+export const resetPassword = async (req: Request, res: Response): Promise<void> => {
+  const connection = await pool.getConnection();
+  try {
+    const { token, newPassword } = req.body;
+
+    // Validate input
+    if (!token || typeof token !== 'string') {
+      res.status(400).json({
+        success: false,
+        message: 'Reset token is required',
+      });
+      return;
+    }
+
+    if (!newPassword || typeof newPassword !== 'string' || newPassword.length < 6) {
+      res.status(400).json({
+        success: false,
+        message: 'Password must be at least 6 characters',
+      });
+      return;
+    }
+
+    // Find user with valid reset token
+    const [users] = await connection.execute(
+      'SELECT id, email FROM users WHERE reset_token = ? AND reset_token_expiry > NOW()',
+      [token]
+    );
+
+    if (!Array.isArray(users) || users.length === 0) {
+      res.status(401).json({
+        success: false,
+        message: 'Invalid or expired reset token',
+      });
+      return;
+    }
+
+    const user = (users[0] as any);
+
+    // Hash new password
+    const salt = await bcryptjs.genSalt(10);
+    const hashedPassword = await bcryptjs.hash(newPassword, salt);
+
+    // Update password and clear reset token
+    await connection.execute(
+      'UPDATE users SET password_hash = ?, reset_token = NULL, reset_token_expiry = NULL WHERE id = ?',
+      [hashedPassword, user.id]
+    );
+
+    res.status(200).json({
+      success: true,
+      message: 'Password updated successfully. Please log in with your new password.',
+    });
+  } catch (error) {
+    console.error('Reset password error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'An error occurred',
       error: error instanceof Error ? error.message : 'Unknown error',
     });
   } finally {
