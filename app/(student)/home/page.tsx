@@ -1,6 +1,9 @@
+"use client";
+
+// Force rebuild - now with allowImportingTsExtensions
 import Button from "@/components/ui/button";
 import Link from "next/link";
-import { services, trips } from "../data";
+import { services, trips } from "../data.tsx";
 import TripCard from "@/components/ui/tripcard";
 
 const page = () => {

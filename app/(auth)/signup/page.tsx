@@ -22,6 +22,9 @@ const page = () => {
     email: "",
     userRole: "student",
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
 
   // Generic handler to manage input changes cleanly
   const handleChange = (
@@ -32,6 +35,68 @@ const page = () => {
       ...prev,
       [id]: value,
     }));
+    setError(""); // Clear error when user starts typing
+  };
+
+  // Handle signup form submission
+  const handleSignup = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
+    try {
+      // Validate form
+      if (!form.email.trim()) {
+        setError("Email is required");
+        setLoading(false);
+        return;
+      }
+
+      if (!form.userRole) {
+        setError("Please select an account type");
+        setLoading(false);
+        return;
+      }
+
+      // Store email and role for redirect
+      const signupEmail = form.email;
+      const signupRole = form.userRole;
+
+      // Call signup API
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/v1/auth/signup`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: signupEmail,
+            userRole: signupRole,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Signup failed");
+      }
+
+      // Success - set success state and redirect after delay
+      setSuccess(true);
+      setForm({ email: "", userRole: "student" });
+
+      // Redirect to OTP page after 1.5 seconds
+      setTimeout(() => {
+        router.push(`/otp?email=${encodeURIComponent(signupEmail)}&role=${signupRole}`);
+      }, 1500);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred during signup");
+      setSuccess(false);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -47,7 +112,7 @@ const page = () => {
           </p>
         </div>
 
-        <form className="space-y-5">
+        <form className="space-y-5" onSubmit={handleSignup}>
           {/* Email input field */}
           <div className="space-y-2 flex flex-col gap-0.5">
             <label htmlFor="email" className="font-semibold text-sm">
@@ -61,6 +126,7 @@ const page = () => {
               value={form.email}
               onChange={handleChange}
               className="bg-white border border-(--stroke) rounded-lg p-4.5"
+              disabled={loading}
             />
           </div>
 
@@ -74,6 +140,7 @@ const page = () => {
               value={form.userRole}
               onChange={handleChange}
               className="bg-white border border-(--stroke) rounded-lg p-4.5"
+              disabled={loading}
             >
               <option value="">Select your role</option>
               <option value="student">Student</option>
@@ -81,6 +148,20 @@ const page = () => {
               <option value="visitor">Visitor</option>
             </select>
           </div>
+
+          {/* Error message display */}
+          {error && (
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg">
+              {error}
+            </div>
+          )}
+
+          {/* Success message display */}
+          {success && (
+            <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg">
+              Signup successful! Redirecting to OTP verification...
+            </div>
+          )}
 
           {/* Privacy policy text */}
           <p className="text-sm">
@@ -92,10 +173,10 @@ const page = () => {
 
           {/* Submit button */}
           <Button
-            text="Continue"
+            text={loading ? "Loading..." : "Continue"}
             type="submit"
             bgColor="primary"
-            onClick={() => router.push("/otp")}
+            disabled={loading}
           />
         </form>
 
@@ -130,16 +211,28 @@ const page = () => {
                 <option value="visitor">Visitor</option>
               </select>
             </div>
-            <Button
-              text="Continue"
-              type="submit"
-              bgColor="primary"
-              onClick={() => {
-                loginRole === "student" || "visitor"
-                  ? router.push("/login/student")
-                  : router.push("/login/staff");
-              }}
-            />
+            <div className="flex gap-2">
+              <Button
+                text="Cancel"
+                type="button"
+                bgColor="primary"
+                onClick={() => setLoginModal(false)}
+              />
+              <Button
+                text="Continue"
+                type="button"
+                bgColor="primary"
+                onClick={() => {
+                  if (loginRole === "student" || loginRole === "visitor") {
+                    router.push("/login/student");
+                  } else if (loginRole === "staff") {
+                    router.push("/login/staff");
+                  } else {
+                    setError("Please select a role");
+                  }
+                }}
+              />
+            </div>
           </div>
         </div>
       )}

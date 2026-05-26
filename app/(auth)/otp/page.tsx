@@ -2,15 +2,23 @@
 
 import Button from "@/components/ui/button";
 import React, { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import PageHeader from "@/components/layout/pageHeader";
 
 export default function OtpPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const email = searchParams.get("email") || "";
+  const role = searchParams.get("role") || "";
+
   // 1. Component State
   const [otp, setOtp] = useState<string[]>(new Array(6).fill(""));
   const [timeLeft, setTimeLeft] = useState<number>(59);
   const [showResend, setShowResend] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [resendLoading, setResendLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
+  const [successMessage, setSuccessMessage] = useState<string>("");
 
   // 2. Refs to target the input fields without document.querySelectorAll
   const inputRefs = useRef<HTMLInputElement[]>([]);
@@ -72,25 +80,85 @@ export default function OtpPage() {
     }
   };
 
-  // 7. Form Submission
-  const handleSubmit = (e: React.FormEvent) => {
+  // 7. Form Submission - Verify OTP with API
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const finalOtp = otp.join("");
 
-    if (finalOtp.length === 6) {
-      alert("Verifying code: " + finalOtp);
-    } else {
-      alert("Please enter a valid 6-digit code");
+    if (finalOtp.length !== 6) {
+      setError("Please enter a valid 6-digit code");
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+    setSuccessMessage("");
+
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/v1/auth/verify-otp`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          otp: finalOtp,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        setSuccessMessage("✅ Email verified successfully!");
+        // Redirect to login page after short delay
+        setTimeout(() => {
+          router.push(`/login/${role}`);
+        }, 1500);
+      } else {
+        setError(data.message || "Verification failed");
+      }
+    } catch (err) {
+      console.error("Verification error:", err);
+      setError("An error occurred while verifying your OTP");
+    } finally {
+      setLoading(false);
     }
   };
 
-  // 8. Resend Action
-  const handleResend = () => {
-    alert("Code resent to s.smith@campus.edu");
-    setOtp(new Array(6).fill("")); // Reset inputs
-    setTimeLeft(59); // Restart countdown
-    setShowResend(false); // Hide resend button
-    inputRefs.current[0]?.focus(); // Refocus first field
+  // 8. Resend Action - Call API
+  const handleResend = async () => {
+    setResendLoading(true);
+    setError("");
+    setSuccessMessage("");
+
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/v1/auth/resend-otp`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        setSuccessMessage("✅ Code resent to " + email);
+        setOtp(new Array(6).fill("")); // Reset inputs
+        setTimeLeft(59); // Restart countdown
+        setShowResend(false); // Hide resend button
+        inputRefs.current[0]?.focus(); // Refocus first field
+      } else {
+        setError(data.message || "Failed to resend code");
+      }
+    } catch (err) {
+      console.error("Resend error:", err);
+      setError("An error occurred while resending the code");
+    } finally {
+      setResendLoading(false);
+    }
   };
 
   return (
@@ -102,8 +170,22 @@ export default function OtpPage() {
           <p className="text-(--ash)">
             We've sent a 6-digit code to your email.
           </p>
-          <p className="font-semibold text-(--primary)">name@uniport.edu.ng</p>
+          <p className="font-semibold text-(--primary)">{email || "your email"}</p>
         </div>
+
+        {/* Error Message */}
+        {error && (
+          <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-red-700 text-sm">{error}</p>
+          </div>
+        )}
+
+        {/* Success Message */}
+        {successMessage && (
+          <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+            <p className="text-green-700 text-sm">{successMessage}</p>
+          </div>
+        )}
 
         <form className="space-y-6" onSubmit={handleSubmit}>
           <div className="flex justify-between gap-2 md:gap-4">
@@ -113,15 +195,16 @@ export default function OtpPage() {
                 ref={(el) => {
                   if (el) inputRefs.current[index] = el;
                 }}
-                type="text" // Changed from 'number' to prevent native browser UI arrows
+                type="text"
                 inputMode="numeric"
                 maxLength={1}
                 pattern="[0-9]*"
                 value={data}
                 required
+                disabled={loading}
                 onChange={(e) => handleChange(e.target, index)}
                 onKeyDown={(e) => handleKeyDown(e, index)}
-                className="w-12 h-14 md:w-14 md:h-16 text-center text-2xl font-bold border border-outline-variant rounded-lg bg-surface transition-all focus:ring-2 focus:ring-(--primary) focus:outline-none"
+                className="w-12 h-14 md:w-14 md:h-16 text-center text-2xl font-bold border border-outline-variant rounded-lg bg-surface transition-all focus:ring-2 focus:ring-(--primary) focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
               />
             ))}
           </div>
@@ -138,20 +221,21 @@ export default function OtpPage() {
             ) : (
               <button
                 onClick={handleResend}
-                className="text-sm font-medium text-(--primary) hover:underline transition-opacity"
+                disabled={resendLoading}
+                className="text-sm font-medium text-(--primary) hover:underline transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
                 type="button"
               >
-                Didn't receive a code? Resend
+                {resendLoading ? "Resending..." : "Didn't receive a code? Resend"}
               </button>
             )}
           </div>
 
           {/* Verify Button */}
           <Button
-            text="Verify"
+            text={loading ? "Verifying..." : "Verify"}
             type="submit"
             bgColor="primary"
-            onClick={() => router.push("/home")}
+            disabled={loading}
           />
         </form>
       </div>
