@@ -14,7 +14,7 @@ const page = () => {
       <PageHeader text="Forgot Password" />
       <div className="p-4 space-y-10">
         <div className="space-y-2">
-          <h4 className="text-3xl font-bold">Forgot Password</h4>
+          <h4 className="text-xl font-bold">Forgot Password</h4>
           <p className=" text-(--ash)">
             Enter your registered email address to receive a secure password
             reset link.

@@ -4,7 +4,7 @@ import HeroImage from "../../../../assets/rider.png";
 import Image from "next/image";
 import { useState } from "react";
 import { FaEyeSlash, FaEye } from "react-icons/fa6";
-import Link from 'next/link'
+import Link from "next/link";
 import Button from "@/components/ui/button";
 
 const page = () => {
@@ -21,8 +21,10 @@ const page = () => {
 
       <div className="px-4 py-3 space-y-10">
         <div className="space-y-2">
-          <h4 className="text-3xl font-bold">Rider Login</h4>
-          <p className=" text-(--ash)">Enter your credentials to start your shift.</p>
+          <h4 className="text-xl font-bold">Rider Login</h4>
+          <p className=" text-(--ash)">
+            Enter your credentials to start your shift.
+          </p>
         </div>
 
         <form action="" className=" space-y-5">
@@ -73,7 +75,10 @@ const page = () => {
           <Button text="Log In" type="submit" bgColor="primary" />
           {/* sign up text */}
           <p className=" text-center text-sm">
-            Don't have an account? <Link href={'/signup'} className="text-(--primary)">Create Account</Link>
+            Don't have an account?{" "}
+            <Link href={"/signup"} className="text-(--primary)">
+              Create Account
+            </Link>
           </p>
         </form>
       </div>

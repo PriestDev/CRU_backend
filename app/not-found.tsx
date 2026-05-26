@@ -1,11 +1,11 @@
-'use client'
+"use client";
 
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import Button from '@/components/ui/button';
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import Button from "@/components/ui/button";
 
 export default function NotFound() {
-  const router = useRouter()
+  const router = useRouter();
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-4 py-8 text-center bg-white">
@@ -37,19 +37,15 @@ export default function NotFound() {
       </svg>
 
       {/* 404 */}
-      <h1
-        className="text-[96px] font-medium leading-none tracking-[-4px] mb-6 text-(--primary)"
-      >
+      <h1 className="text-[96px] font-medium leading-none tracking-[-4px] mb-6 text-(--primary)">
         404
       </h1>
 
       {/* Divider */}
-      <div
-        className="w-10 h-0.5 rounded-full mb-6 bg-(--primary)"
-      />
+      <div className="w-10 h-0.5 rounded-full mb-6 bg-(--primary)" />
 
       {/* Text */}
-      <p className="text-xl font-medium text-gray-900 mb-3">Page not found</p>
+      <p className="text-lg font-medium text-gray-900 mb-3">Page not found</p>
       <p className="text-sm text-gray-500 leading-relaxed max-w-65 mx-auto mb-10">
         The page you're looking for doesn't exist or has been moved.
       </p>
@@ -58,11 +54,16 @@ export default function NotFound() {
       <div className="flex flex-col gap-3 w-full">
         <Link
           href="/"
-          className="w-full flex items-center justify-center gap-2 p-3.5 rounded-xl font-bold text-white transition-opacity hover:opacity-90 bg-(--primary) text-lg"
+          className="w-full flex items-center justify-center gap-2 p-3.5 rounded-xl font-bold text-white transition-opacity hover:opacity-90 bg-(--primary) text-base"
         >
           Go home
         </Link>
-        <Button text="Go back" type='button' className='text-(--ash) border border-(--ash)' onClick={() => router.back()} />
+        <Button
+          text="Go back"
+          type="button"
+          className="text-(--ash) border border-(--ash)"
+          onClick={() => router.back()}
+        />
       </div>
     </div>
   );

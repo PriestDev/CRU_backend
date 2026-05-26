@@ -2,31 +2,18 @@
 
 import Button from "@/components/ui/button";
 import React, { useState, useEffect, useRef } from "react";
-import { useRouter } from 'next/navigation'
-import PageHeader from '@/components/layout/pageHeader'
+import { useRouter } from "next/navigation";
+import PageHeader from "@/components/layout/pageHeader";
 
 export default function OtpPage() {
-  const router = useRouter()
+  const router = useRouter();
   // 1. Component State
   const [otp, setOtp] = useState<string[]>(new Array(6).fill(""));
   const [timeLeft, setTimeLeft] = useState<number>(59);
   const [showResend, setShowResend] = useState<boolean>(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string>("");
-  const [email, setEmail] = useState<string>("");
 
   // 2. Refs to target the input fields without document.querySelectorAll
   const inputRefs = useRef<HTMLInputElement[]>([]);
-
-  // Get email from localStorage on mount
-  useEffect(() => {
-    const verificationEmail = localStorage.getItem("verificationEmail");
-    if (!verificationEmail) {
-      router.push("/signup");
-      return;
-    }
-    setEmail(verificationEmail);
-  }, [router]);
 
   // 3. Timer Logic using useEffect
   useEffect(() => {
@@ -86,83 +73,24 @@ export default function OtpPage() {
   };
 
   // 7. Form Submission
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const finalOtp = otp.join("");
 
-    if (finalOtp.length !== 6) {
-      setError("Please enter a valid 6-digit code");
-      return;
-    }
-
-    setLoading(true);
-    setError("");
-
-    try {
-      const response = await fetch("http://localhost:5000/api/v1/auth/verify-otp", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: email,
-          otp: finalOtp,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        setError(data.message || "OTP verification failed. Please try again.");
-        setLoading(false);
-        return;
-      }
-
-      // Clear localStorage
-      localStorage.removeItem("verificationEmail");
-      localStorage.removeItem("userRole");
-
-      // Redirect to dashboard or home
-      router.push("/dashboard");
-    } catch (err) {
-      setError("Network error. Please check your connection and try again.");
-      setLoading(false);
+    if (finalOtp.length === 6) {
+      alert("Verifying code: " + finalOtp);
+    } else {
+      alert("Please enter a valid 6-digit code");
     }
   };
 
   // 8. Resend Action
-  const handleResend = async () => {
-    setLoading(true);
-    setError("");
-
-    try {
-      const response = await fetch("http://localhost:5000/api/v1/auth/resend-otp", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: email,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        setError(data.message || "Failed to resend OTP");
-        setLoading(false);
-        return;
-      }
-
-      setOtp(new Array(6).fill("")); // Reset inputs
-      setTimeLeft(59); // Restart countdown
-      setShowResend(false); // Hide resend button
-      inputRefs.current[0]?.focus(); // Refocus first field
-      setLoading(false);
-    } catch (err) {
-      setError("Network error. Please try again.");
-      setLoading(false);
-    }
+  const handleResend = () => {
+    alert("Code resent to s.smith@campus.edu");
+    setOtp(new Array(6).fill("")); // Reset inputs
+    setTimeLeft(59); // Restart countdown
+    setShowResend(false); // Hide resend button
+    inputRefs.current[0]?.focus(); // Refocus first field
   };
 
   return (
@@ -170,18 +98,12 @@ export default function OtpPage() {
       <PageHeader text="OTP Verification" />
       <div className="p-4 space-y-10 max-w-md mx-auto">
         <div className="space-y-2">
-          <h4 className="text-3xl font-bold">Verify your email</h4>
+          <h4 className="text-xl font-bold">Verify your email</h4>
           <p className="text-(--ash)">
             We've sent a 6-digit code to your email.
           </p>
-          <p className="font-semibold text-(--primary)">{email}</p>
+          <p className="font-semibold text-(--primary)">name@uniport.edu.ng</p>
         </div>
-
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
-            {error}
-          </div>
-        )}
 
         <form className="space-y-6" onSubmit={handleSubmit}>
           <div className="flex justify-between gap-2 md:gap-4">
@@ -199,8 +121,7 @@ export default function OtpPage() {
                 required
                 onChange={(e) => handleChange(e.target, index)}
                 onKeyDown={(e) => handleKeyDown(e, index)}
-                disabled={loading}
-                className="w-12 h-14 md:w-14 md:h-16 text-center text-2xl font-bold border border-outline-variant rounded-lg bg-surface transition-all focus:ring-2 focus:ring-(--primary) focus:outline-none disabled:opacity-50"
+                className="w-12 h-14 md:w-14 md:h-16 text-center text-2xl font-bold border border-outline-variant rounded-lg bg-surface transition-all focus:ring-2 focus:ring-(--primary) focus:outline-none"
               />
             ))}
           </div>
@@ -217,9 +138,8 @@ export default function OtpPage() {
             ) : (
               <button
                 onClick={handleResend}
-                className="text-sm font-medium text-(--primary) hover:underline transition-opacity disabled:opacity-50"
+                className="text-sm font-medium text-(--primary) hover:underline transition-opacity"
                 type="button"
-                disabled={loading}
               >
                 Didn't receive a code? Resend
               </button>
@@ -228,10 +148,10 @@ export default function OtpPage() {
 
           {/* Verify Button */}
           <Button
-            text={loading ? "Verifying..." : "Verify"}
+            text="Verify"
             type="submit"
             bgColor="primary"
-            disabled={loading}
+            onClick={() => router.push("/home")}
           />
         </form>
       </div>

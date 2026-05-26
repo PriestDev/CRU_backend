@@ -16,5 +16,6 @@
 /* Force the body tag to use the Tailwind sans font utility */
 body {
   @apply font-sans;
-  color: var(--dark-text)
+  color: var(--dark-text);
+  font-size: 12px;
 }

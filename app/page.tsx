@@ -15,17 +15,21 @@ export default function Home() {
         alt="Order ride illustration"
         width={400}
         height={500}
-        priority
-        className="p-15 pb-0 w-auto h-auto"
+        className="p-15 pb-0"
       />
       <div className="space-y-3">
-        <h1 className="text-3xl font-bold text-center text-(--primary)">
+        <h1 className="text-xl font-bold text-center text-(--primary)">
           Welcome to Campus Ride
         </h1>
         <p className="text-center">
           The most reliable way to navigate you campus effortlessly and safely.
         </p>
-        <Button text="Get Started" type="button" onClick={() => router.push("/signup")} bgColor="primary" />
+        <Button
+          text="Get Started"
+          type="button"
+          onClick={() => router.push("/signup")}
+          bgColor="primary"
+        />
       </div>
     </main>
   );
