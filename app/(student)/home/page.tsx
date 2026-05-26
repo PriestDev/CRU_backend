@@ -24,8 +24,8 @@ const page = () => {
       <main className="space-y-4 px-4">
         <section className="space-y-4 py-4">
           {/* search bar */}
-          <div className="">
-            <div className="flex items-center bg-white rounded-xl border border-(--primary)/10 p-4 gap-4 placeholder:font-bold placeholder:text-(--ash)">
+          {/* <div className="">
+            <div className="flex items-center bg-white rounded-lg border border-(--primary)/10 p-4 gap-4 placeholder:font-bold placeholder:text-(--lightText)">
               <span className="material-symbols-outlined text-(--primary)">
                 search
               </span>
@@ -35,9 +35,9 @@ const page = () => {
                 className="w-full focus:outline-0 focus:border-0"
               />
             </div>
-          </div>
+          </div> */}
           {/* carpooling CTA */}
-          <section className="bg-(--primary) p-6 rounded-xl text-white space-y-2">
+          <section className="bg-(--primary) p-6 rounded-lg text-white space-y-2">
             <h4 className=" font-bold text-lg">Save with Carpooling</h4>
             <p className=" text-white/80">
               Share your commute with fellow students and split the costs.
@@ -50,14 +50,14 @@ const page = () => {
         {/* services section */}
         <section className=" space-y-4">
           <h4 className="text-lg font-bold">Shuttle Services</h4>
-          <div className="grid grid-cols-4 gap-10">
+          <div className="grid grid-cols-4 gap-5">
             {services.map((service, index) => (
               <Link
                 href={service.link}
                 key={index}
-                className="flex flex-col gap-1.5 items-center"
+                className="flex flex-col gap-1 items-center"
               >
-                <div className="text-(--primary) bg-(--primary)/10 w-15 h-15 rounded-2xl  flex items-center justify-center">
+                <div className="text-(--primary) bg-(--primary)/10 w-15 h-15 rounded-lg flex items-center justify-center">
                   {service.icon}
                 </div>
                 <p className="font-semibold text-nowrap">{service.name}</p>
@@ -73,7 +73,7 @@ const page = () => {
               See all
             </Link>
           </div>
-          <div className="space-y-4">
+          <div className="space-y-2">
             {displayedTrips.map((trip, index) => (
               <div key={index}>
                 <TripCard

@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: var(--font-inter), sans-serif;
+  --font-sans: var(--font-webFont), sans-serif;
 }
 
 :root {
@@ -11,11 +11,16 @@
   --ash: #94A3B8;
   --appRed: #DC2626;
   --stroke: #CBD5E1;
+  --lightText: #64748B;
 }
 
 /* Force the body tag to use the Tailwind sans font utility */
 body {
-  @apply font-sans;
+  /* @apply font-sans; */
   color: var(--dark-text);
   font-size: 12px;
+}
+
+.material-symbols-outlined {
+  font-size: inherit;
 }

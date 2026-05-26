@@ -105,9 +105,9 @@ const page = () => {
         <Image src={HeroImage} alt="Hero Image" width={500} height={300} />
       </div>
       <div className="px-4 py-3 space-y-10">
-        <div className="space-y-2">
-          <h4 className="text-xl font-bold">Create account</h4>
-          <p className="text-(--ash)">
+        <div className="">
+          <h4 className="text-lg font-bold">Create account</h4>
+          <p className="text-(--lightText)">
             Safe transit for the university community
           </p>
         </div>
@@ -115,7 +115,7 @@ const page = () => {
         <form className="space-y-5" onSubmit={handleSignup}>
           {/* Email input field */}
           <div className="space-y-2 flex flex-col gap-0.5">
-            <label htmlFor="email" className="font-semibold text-sm">
+            <label htmlFor="email" className="font-semibold">
               University Email
             </label>
             <input
@@ -132,7 +132,7 @@ const page = () => {
 
           {/* role input */}
           <div className="space-y-2 flex flex-col gap-0.5">
-            <label htmlFor="userRole" className="font-semibold text-sm">
+            <label htmlFor="userRole" className="font-semibold">
               Account type
             </label>
             <select
@@ -164,7 +164,7 @@ const page = () => {
           )}
 
           {/* Privacy policy text */}
-          <p className="text-sm">
+          <p className="">
             By clicking continue, you agree to our{" "}
             <Link href="/privacy-policy" className="text-(--primary)">
               Privacy policy.
@@ -181,7 +181,7 @@ const page = () => {
         </form>
 
         {/* Log in text - Fixed to point directly to form.userRole */}
-        <p className="text-center text-sm">
+        <p className="text-center">
           Already have an account?{" "}
           <button
             onClick={() => setLoginModal(true)}
@@ -194,7 +194,7 @@ const page = () => {
 
       {loginModal && (
         <div className=" fixed top-0 left-0 bg-black/80 h-screen w-full flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl p-6 w-full space-y-5">
+          <div className="bg-white rounded-lg p-6 w-full space-y-5">
             <div className="space-y-2 flex flex-col gap-0.5">
               <label htmlFor="loginRole" className="font-semibold text-sm">
                 Login as...
