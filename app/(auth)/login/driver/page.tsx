@@ -53,9 +53,9 @@ const page = () => {
         setSuccessMessage("✅ Login successful! Redirecting...");
         // Store user data in localStorage (optional)
         localStorage.setItem("user", JSON.stringify(data.data));
-        // Redirect to rider dashboard
+        // Redirect to dashboard
         setTimeout(() => {
-          router.push("/rider/dashboard");
+          router.push("/dashboard");
         }, 1000);
       } else {
         setError(data.message || "Login failed");

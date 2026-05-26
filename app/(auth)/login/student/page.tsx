@@ -53,9 +53,9 @@ const page = () => {
         setSuccessMessage("✅ Login successful! Redirecting...");
         // Store user data in localStorage (optional)
         localStorage.setItem("user", JSON.stringify(data.data));
-        // Redirect to student dashboard
+        // Redirect to home
         setTimeout(() => {
-          router.push("/student/home");
+          router.push("/home");
         }, 1000);
       } else {
         setError(data.message || "Login failed");
