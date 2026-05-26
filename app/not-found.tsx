@@ -54,14 +54,14 @@ export default function NotFound() {
       <div className="flex flex-col gap-3 w-full">
         <Link
           href="/"
-          className="w-full flex items-center justify-center gap-2 p-3.5 rounded-xl font-bold text-white transition-opacity hover:opacity-90 bg-(--primary) text-base"
+          className="w-full flex items-center justify-center gap-2 p-3.5 rounded-lg font-bold text-white transition-opacity hover:opacity-90 bg-(--primary) text-base"
         >
           Go home
         </Link>
         <Button
           text="Go back"
           type="button"
-          className="text-(--ash) border border-(--ash)"
+          className="text-(--lightText) border border-(--stroke)"
           onClick={() => router.back()}
         />
       </div>

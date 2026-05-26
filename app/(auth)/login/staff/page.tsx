@@ -21,18 +21,18 @@ const page = () => {
       </div>
 
       <div className="px-4 py-3 space-y-10">
-        <div className="space-y-2">
-          <h4 className="text-xl font-bold">Staff Login</h4>
-          <p className=" text-(--ash)">
+        <div className="">
+          <h4 className="text-lg font-bold">Staff Login</h4>
+          <p className=" text-(--lightText)">
             Enter your credentials to access the secure administrative
             dashboard.
           </p>
         </div>
 
-        <form action="" className=" space-y-5">
+        <form action="" className=" space-y-2">
           {/* email input field */}
           <div className="space-y-2 flex flex-col gap-0.5">
-            <label htmlFor="email" className=" font-semibold text-sm">
+            <label htmlFor="email" className=" font-semibold">
               Staff Email
             </label>
             <input
@@ -46,7 +46,7 @@ const page = () => {
           </div>
           {/* staff ID input field */}
           <div className="space-y-2 flex flex-col gap-0.5">
-            <label htmlFor="staffID" className=" font-semibold text-sm">
+            <label htmlFor="staffID" className=" font-semibold">
               Staff ID
             </label>
             <input
@@ -60,7 +60,7 @@ const page = () => {
           </div>
           {/* password input field */}
           <div className="space-y-2 flex flex-col gap-0.5">
-            <label htmlFor="password" className=" font-semibold text-sm">
+            <label htmlFor="password" className=" font-semibold">
               Password
             </label>
             <div className="bg-white border border-(--stroke) rounded-lg p-4.5 flex items-center justify-between">
@@ -74,7 +74,7 @@ const page = () => {
               />
               <div
                 onClick={() => setVisible(!visible)}
-                className="text-(--ash)"
+                className="text-(--lightText)"
               >
                 {visible ? <FaEyeSlash /> : <FaEye />}
               </div>
@@ -83,14 +83,14 @@ const page = () => {
           {/* forgot password button */}
           <Link
             href={"/forgot-password"}
-            className="float-right text-(--primary) text-sm"
+            className="float-right text-(--primary)"
           >
             Forgot password?
           </Link>
           {/* submit button */}
           <Button text="Log In" type="submit" bgColor="primary" />
           {/* sign up text */}
-          <p className=" text-center text-sm">
+          <p className=" text-center">
             Don't have an account?{" "}
             <Link href={"/signup"} className="text-(--primary)">
               Create Account

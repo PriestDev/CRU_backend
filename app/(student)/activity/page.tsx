@@ -19,29 +19,29 @@ const page = () => {
       <div className="border-b border-(--stroke)">
         <PageHeader text="Activity" />
       </div>
-      <div className="border-b border-(--stroke) px-4 grid grid-cols-2 text-(--ash)">
+      <div className="border-b border-(--stroke) px-4 grid grid-cols-2 text-(--lightText)">
         <button
-          className={`p-4 ${section === "ridesSection" ? "border-b-2 border-(--primary) font-bold text-(--primary)" : ""}`}
+          className={`p-4 border-b-2 ${section === "ridesSection" ? "border-(--primary) font-bold text-(--primary)" : "border-transparent"}`}
           onClick={() => setSection("ridesSection")}
         >
           Trips
         </button>
         <button
-          className={`p-4 ${section === "deliveriesSection" ? "border-b-2 border-(--primary) font-bold text-(--primary)" : ""}`}
+          className={`p-4 border-b-2 ${section === "deliveriesSection" ? "border-(--primary) font-bold text-(--primary)" : "border-transparent"}`}
           onClick={() => setSection("deliveriesSection")}
         >
           Deliveries
         </button>
       </div>
       <div className="p-4 space-y-4">
-        <div className="flex items-center justify-between">
+        {/* <div className="flex items-center justify-between">
           <h4 className="text-lg font-bold">Recent Trips</h4>
           <Link href="/activity" className="text-(--primary) font-bold">
             Filter
           </Link>
-        </div>
+        </div> */}
 
-        <div>
+        <div className="space-y-2">
           {section === "ridesSection" &&
             ridesDone.map((ride, index) => (
               <div key={index}>

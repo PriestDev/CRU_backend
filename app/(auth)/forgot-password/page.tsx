@@ -13,18 +13,18 @@ const page = () => {
     <>
       <PageHeader text="Forgot Password" />
       <div className="p-4 space-y-10">
-        <div className="space-y-2">
-          <h4 className="text-xl font-bold">Forgot Password</h4>
-          <p className=" text-(--ash)">
+        <div className="">
+          <h4 className="text-lg font-bold">Forgot Password</h4>
+          <p className=" text-(--lightText)">
             Enter your registered email address to receive a secure password
             reset link.
           </p>
         </div>
 
-        <form action="" className=" space-y-5">
+        <form action="" className=" space-y-2">
           {/* email input field */}
           <div className="space-y-2 flex flex-col gap-0.5">
-            <label htmlFor="email" className=" font-semibold text-sm">
+            <label htmlFor="email" className=" font-semibold">
               Email
             </label>
             <input
@@ -40,7 +40,7 @@ const page = () => {
           <Button text="Send reset link" type="submit" bgColor="primary" />
         </form>
         {/* sign up text */}
-        <p className=" text-center text-sm">
+        <p className=" text-center">
           Don't have an account?{" "}
           <span onClick={() => router.back()} className="text-(--primary)">
             Back to login

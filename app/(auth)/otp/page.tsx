@@ -97,15 +97,15 @@ export default function OtpPage() {
     <>
       <PageHeader text="OTP Verification" />
       <div className="p-4 space-y-10 max-w-md mx-auto">
-        <div className="space-y-2">
-          <h4 className="text-xl font-bold">Verify your email</h4>
-          <p className="text-(--ash)">
+        <div className="">
+          <h4 className="text-lg font-bold">Verify your email</h4>
+          <p className="text-(--lightText)">
             We've sent a 6-digit code to your email.
           </p>
           <p className="font-semibold text-(--primary)">name@uniport.edu.ng</p>
         </div>
 
-        <form className="space-y-6" onSubmit={handleSubmit}>
+        <form className="space-y-2" onSubmit={handleSubmit}>
           <div className="flex justify-between gap-2 md:gap-4">
             {otp.map((data, index) => (
               <input
@@ -121,7 +121,7 @@ export default function OtpPage() {
                 required
                 onChange={(e) => handleChange(e.target, index)}
                 onKeyDown={(e) => handleKeyDown(e, index)}
-                className="w-12 h-14 md:w-14 md:h-16 text-center text-2xl font-bold border border-outline-variant rounded-lg bg-surface transition-all focus:ring-2 focus:ring-(--primary) focus:outline-none"
+                className="w-12 h-14 md:w-14 md:h-16 text-center text-2xl font-bold border border-(--stroke) rounded-lg transition-all focus:ring-2 focus:ring-(--primary) focus:outline-none"
               />
             ))}
           </div>
@@ -129,7 +129,7 @@ export default function OtpPage() {
           {/* Timer & Resend Container */}
           <div className="text-center min-h-6">
             {!showResend ? (
-              <p className="text-sm text-on-surface-variant">
+              <p className="">
                 Resend code in{" "}
                 <span className="text-(--primary) font-bold">
                   {formatTime(timeLeft)}
@@ -138,7 +138,7 @@ export default function OtpPage() {
             ) : (
               <button
                 onClick={handleResend}
-                className="text-sm font-medium text-(--primary) hover:underline transition-opacity"
+                className=" font-medium text-(--primary) hover:underline transition-opacity"
                 type="button"
               >
                 Didn't receive a code? Resend
