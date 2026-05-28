@@ -4,6 +4,7 @@ import Button from "@/components/ui/button";
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import PageHeader from "@/components/layout/pageHeader";
+import { Suspense } from "react";
 
 export default function OtpPage() {
   const router = useRouter();
@@ -168,7 +169,7 @@ export default function OtpPage() {
   };
 
   return (
-    <>
+    <Suspense fallback={<div>Loading...</div>}>
       <PageHeader text="OTP Verification" />
       <div className="p-4 space-y-5 max-w-md mx-auto">
         <div className="space-y-2">
@@ -249,6 +250,6 @@ export default function OtpPage() {
           />
         </form>
       </div>
-    </>
+    </Suspense>
   );
 }
