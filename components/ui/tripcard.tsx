@@ -4,7 +4,7 @@ const tripcard = (props: tripProps) => {
   return (
     <div className="flex items-center justify-between gap-2 p-4 bg-white rounded-lg border border-(--stroke)/10 shadow-xs">
       <div className="flex items-center gap-2">
-        <div className="text-(--primary) bg-(--primary)/10 rounded-lg flex items-center justify-center w-12 h-12">
+        <div className="text-(--primary) bg-(--primary)/10 rounded-lg flex items-center justify-center w-10 h-10 shrink-0">
           {props.type === "ride" ? (
             <span className="material-symbols-outlined">electric_rickshaw</span>
           ) : props.type === "delivery" ? (

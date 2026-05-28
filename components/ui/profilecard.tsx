@@ -14,7 +14,7 @@ const profilecard = (props: ProfileCardProps) => {
       className="flex items-center justify-between bg-white rounded-lg p-4"
     >
       <div className="flex items-center gap-4">
-        <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-(--primary)/10 text-(--primary)">
+        <div className="flex items-center justify-center w-10 h-10 shrink-0 rounded-lg bg-(--primary)/10 text-(--primary)">
           <span className="material-symbols-outlined">{props.icon}</span>
         </div>
         <div>

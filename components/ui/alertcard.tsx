@@ -7,7 +7,7 @@ const alertcard = (props: NotificationProps) => {
     >
       <div className="flex gap-2">
         <div
-          className={`flex justify-center items-center w-12 h-12 shrink-0 rounded-lg ${
+          className={`flex justify-center items-center w-10 h-10 shrink-0 rounded-lg ${
             props.type === "ride"
               ? props.isRead
                 ? "bg-(--primary)/10 text-(--primary)"
