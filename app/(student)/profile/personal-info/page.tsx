@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import Image from "next/image";
 import PageHeader from "@/components/layout/pageHeader";
@@ -39,8 +39,8 @@ const page = () => {
         {/* form section */}
         <form className="space-y-5">
           {/* name input field */}
-          <div className="space-y-2 flex flex-col gap-0.5">
-            <label htmlFor="name" className="font-semibold text-sm">
+          <div className="flex flex-col gap-1">
+            <label htmlFor="name" className="font-semibold">
               Full Name
             </label>
             <input
@@ -49,12 +49,12 @@ const page = () => {
               placeholder="Enter fullname"
               defaultValue={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
-              className="bg-white border border-(--stroke) rounded-lg p-4.5 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-white border border-(--stroke) rounded-lg p-4.5 py-3 disabled:opacity-50 disabled:cursor-not-allowed"
             />
           </div>
           {/* email input field */}
-          <div className="space-y-2 flex flex-col gap-0.5">
-            <label htmlFor="email" className="font-semibold text-sm">
+          <div className="flex flex-col gap-1">
+            <label htmlFor="email" className="font-semibold">
               Email
             </label>
             <input
@@ -63,12 +63,12 @@ const page = () => {
               placeholder="Enter your university email"
               defaultValue={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
-              className="bg-white border border-(--stroke) rounded-lg p-4.5 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-white border border-(--stroke) rounded-lg p-4.5 py-3 disabled:opacity-50 disabled:cursor-not-allowed"
             />
           </div>
           {/* phone number input field */}
-          <div className="space-y-2 flex flex-col gap-0.5">
-            <label htmlFor="number" className="font-semibold text-sm">
+          <div className="flex flex-col gap-1">
+            <label htmlFor="number" className="font-semibold">
               Phone Number
             </label>
             <input
@@ -79,12 +79,12 @@ const page = () => {
               onChange={(e) =>
                 setForm({ ...form, phoneNumber: e.target.value })
               }
-              className="bg-white border border-(--stroke) rounded-lg p-4.5 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-white border border-(--stroke) rounded-lg p-4.5 py-3 disabled:opacity-50 disabled:cursor-not-allowed"
             />
           </div>
           {/* id input field */}
-          <div className="space-y-2 flex flex-col gap-0.5">
-            <label htmlFor="id" className="font-semibold text-sm">
+          <div className="flex flex-col gap-1">
+            <label htmlFor="id" className="font-semibold">
               Campus ID
             </label>
             <input
@@ -92,10 +92,8 @@ const page = () => {
               type="text"
               placeholder="Enter your campus ID"
               defaultValue={form.ID}
-              onChange={(e) =>
-                setForm({ ...form, ID: e.target.value })
-              }
-              className="bg-white border border-(--stroke) rounded-lg p-4.5 disabled:opacity-50 disabled:cursor-not-allowed"
+              onChange={(e) => setForm({ ...form, ID: e.target.value })}
+              className="bg-white border border-(--stroke) rounded-lg p-4.5 py-3 disabled:opacity-50 disabled:cursor-not-allowed"
             />
           </div>
           {/* submit button */}

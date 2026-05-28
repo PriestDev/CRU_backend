@@ -66,7 +66,7 @@ const ResetPasswordPage = () => {
             token,
             newPassword,
           }),
-        }
+        },
       );
 
       const data = await response.json();
@@ -90,7 +90,7 @@ const ResetPasswordPage = () => {
   return (
     <>
       <PageHeader text="Reset Password" />
-      <div className="p-4 space-y-10">
+      <div className="p-4 space-y-5">
         <div className="space-y-2">
           <h4 className="text-xl font-bold">Reset Your Password</h4>
           <p className="text-(--ash)">
@@ -114,8 +114,8 @@ const ResetPasswordPage = () => {
 
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* New password input */}
-          <div className="space-y-2 flex flex-col gap-0.5">
-            <label htmlFor="newPassword" className="font-semibold text-sm">
+          <div className="flex flex-col gap-1">
+            <label htmlFor="newPassword" className="font-semibold">
               New Password
             </label>
             <div className="relative">
@@ -139,8 +139,8 @@ const ResetPasswordPage = () => {
           </div>
 
           {/* Confirm password input */}
-          <div className="space-y-2 flex flex-col gap-0.5">
-            <label htmlFor="confirmPassword" className="font-semibold text-sm">
+          <div className="flex flex-col gap-1">
+            <label htmlFor="confirmPassword" className="font-semibold">
               Confirm Password
             </label>
             <div className="relative">

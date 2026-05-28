@@ -95,16 +95,19 @@ export default function OtpPage() {
     setSuccessMessage("");
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/v1/auth/verify-otp`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/v1/auth/verify-otp`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email,
+            otp: finalOtp,
+          }),
         },
-        body: JSON.stringify({
-          email,
-          otp: finalOtp,
-        }),
-      });
+      );
 
       const data = await response.json();
 
@@ -132,15 +135,18 @@ export default function OtpPage() {
     setSuccessMessage("");
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/v1/auth/resend-otp`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/v1/auth/resend-otp`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email,
+          }),
         },
-        body: JSON.stringify({
-          email,
-        }),
-      });
+      );
 
       const data = await response.json();
 
@@ -164,13 +170,15 @@ export default function OtpPage() {
   return (
     <>
       <PageHeader text="OTP Verification" />
-      <div className="p-4 space-y-10 max-w-md mx-auto">
+      <div className="p-4 space-y-5 max-w-md mx-auto">
         <div className="space-y-2">
           <h4 className="text-xl font-bold">Verify your email</h4>
           <p className="text-(--ash)">
             We've sent a 6-digit code to your email.
           </p>
-          <p className="font-semibold text-(--primary)">{email || "your email"}</p>
+          <p className="font-semibold text-(--primary)">
+            {email || "your email"}
+          </p>
         </div>
 
         {/* Error Message */}
@@ -225,7 +233,9 @@ export default function OtpPage() {
                 className="text-sm font-medium text-(--primary) hover:underline transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
                 type="button"
               >
-                {resendLoading ? "Resending..." : "Didn't receive a code? Resend"}
+                {resendLoading
+                  ? "Resending..."
+                  : "Didn't receive a code? Resend"}
               </button>
             )}
           </div>

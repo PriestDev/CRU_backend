@@ -35,13 +35,15 @@ const page = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ email }),
-        }
+        },
       );
 
       const data = await response.json();
 
       if (response.ok && data.success) {
-        setSuccess("✅ Password reset link sent to your email. Check your inbox.");
+        setSuccess(
+          "✅ Password reset link sent to your email. Check your inbox.",
+        );
         setEmail("");
         // Redirect to login after 2 seconds
         setTimeout(() => {
@@ -61,7 +63,7 @@ const page = () => {
   return (
     <>
       <PageHeader text="Forgot Password" />
-      <div className="p-4 space-y-10">
+      <div className="p-4 space-y-5">
         <div className="space-y-2">
           <h4 className="text-xl font-bold">Forgot Password</h4>
           <p className=" text-(--ash)">
@@ -86,7 +88,7 @@ const page = () => {
 
         <form onSubmit={handleSubmit} className=" space-y-5">
           {/* email input field */}
-          <div className="space-y-2 flex flex-col gap-0.5">
+          <div className="flex flex-col gap-1">
             <label htmlFor="email" className=" font-semibold text-sm">
               Email
             </label>
@@ -97,7 +99,7 @@ const page = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               disabled={loading}
-              className="bg-white border border-(--stroke) rounded-lg p-4.5 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-white border border-(--stroke) rounded-lg p-4.5 py-3 disabled:opacity-50 disabled:cursor-not-allowed"
             />
           </div>
           {/* submit button */}
