@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Button from "@/components/ui/button";
 import PageHeader from "@/components/layout/pageHeader";
 import { FaEyeSlash, FaEye } from "react-icons/fa";
+import { Suspense } from "react";
 
 const ResetPasswordPage = () => {
   const router = useRouter();
@@ -88,7 +89,7 @@ const ResetPasswordPage = () => {
   };
 
   return (
-    <>
+    <Suspense fallback={<div>Loading...</div>}>
       <PageHeader text="Reset Password" />
       <div className="p-4 space-y-5">
         <div className="space-y-2">
@@ -182,7 +183,7 @@ const ResetPasswordPage = () => {
           </button>
         </p>
       </div>
-    </>
+    </Suspense>
   );
 };
 
