@@ -6,6 +6,7 @@ import HeroImage from "../../../assets/staff.png";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Button from "@/components/ui/button";
+import PrivacyPolicy from "./privacypolicy";
 
 type UserRole = "staff" | "student" | "visitor";
 
@@ -25,6 +26,7 @@ const page = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [privacyPolicy, setPrivacyPolicy] = useState(false);
 
   // Generic handler to manage input changes cleanly
   const handleChange = (
@@ -170,9 +172,12 @@ const page = () => {
           {/* Privacy policy text */}
           <p className="">
             By clicking continue, you agree to our{" "}
-            <Link href="/privacy-policy" className="text-(--primary)">
+            <span
+              onClick={() => setPrivacyPolicy(true)}
+              className="cursor-pointer text-(--primary)"
+            >
               Privacy policy.
-            </Link>
+            </span>
           </p>
 
           {/* Submit button */}
@@ -240,6 +245,7 @@ const page = () => {
           </div>
         </div>
       )}
+      {privacyPolicy && <PrivacyPolicy onClose={()=> setPrivacyPolicy(false)}/>}
     </>
   );
 };
