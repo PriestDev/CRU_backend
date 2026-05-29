@@ -5,18 +5,18 @@ import { useState } from "react";
 import Button from "@/components/ui/button";
 
 const page = () => {
-  const [deliveryIndex, setDeliveryIndex] = useState <number>(0)
+  const [deliveryIndex, setDeliveryIndex] = useState<number>(0);
   return (
     <div>
       <div className="border-b border-(--stroke)">
         <PageHeader text="Package Delivery" />
       </div>
-      <form className=" p-4 space-y-5">
+      <form className=" p-4 space-y-4">
         <div className="space-y-2">
           <h4 className="font-bold uppercase text-(--lightText) tracking-wider">
             Route Details
           </h4>
-          <div className="space-y-2">
+          <div className="space-y-4">
             {/* pickup field */}
             <div className="flex flex-col gap-1">
               <label htmlFor="pickup" className="font-semibold">
@@ -47,7 +47,7 @@ const page = () => {
           <h4 className="font-bold uppercase text-(--lightText) tracking-wider">
             Package Information
           </h4>
-          <div className="space-y-2">
+          <div className="space-y-4">
             {/* package type */}
             <div className="grid grid-cols-3 gap-2 text-(--lightText)">
               {[
@@ -58,7 +58,7 @@ const page = () => {
                 <div
                   key={index}
                   className={`flex flex-col items-center justify-center border-[1.75px] rounded-lg p-4 font-semibold cursor-pointer ${deliveryIndex === index ? "border-(--primary) text-(--primary)" : "border-(--stroke)"}`}
-                  onClick={()=>setDeliveryIndex(index)}
+                  onClick={() => setDeliveryIndex(index)}
                 >
                   <span className="material-symbols-outlined">{type.icon}</span>
                   <p>{type.type}</p>
@@ -90,7 +90,7 @@ const page = () => {
             </div>
           </div>
         </div>
-        <Button text="Order delivery" type="submit" bgColor="primary"/>
+        <Button text="Order delivery" type="submit" bgColor="primary" />
       </form>
     </div>
   );
