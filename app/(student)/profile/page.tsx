@@ -13,11 +13,7 @@ const page = () => {
       <div className="border-b border-(--stroke)">
         <PageHeader
           text="Profile"
-          extra={
-            <span className="material-symbols-outlined">
-              settings
-            </span>
-          }
+          extra={<span className="material-symbols-outlined">settings</span>}
         />
       </div>
       <div className="p-4 space-y-4">
@@ -32,11 +28,13 @@ const page = () => {
           </div>
           <div className="text-center">
             <h4 className="text-lg font-bold">Alex Johnson</h4>
-            <p className="text-(--lightText)"><b>Campus ID:</b> 3020001</p>
+            <p className="text-(--lightText)">
+              <b>Campus ID:</b> 3020001
+            </p>
           </div>
         </div>
 
-        <div className="space-y-10">
+        <div className="space-y-5">
           <div className="space-y-2">
             <h4 className="font-bold uppercase text-(--lightText) tracking-wider">
               Account Details

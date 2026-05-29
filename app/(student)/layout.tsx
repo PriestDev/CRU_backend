@@ -1,9 +1,13 @@
-import { ReactNode } from "react"
+import { ReactNode } from "react";
+import Nav from "@/components/layout/nav";
 
-const layout = ({children} : {children: ReactNode}) => {
+const studentLayout = ({ children }: { children: ReactNode }) => {
   return (
-    <div>{children}</div>
-  )
-}
+    <>
+      <div className="pb-25 bg-(--background) min-h-screen">{children}</div>
+      <Nav />
+    </>
+  );
+};
 
-export default layout
+export default studentLayout;

@@ -74,7 +74,7 @@ const page = () => {
             email: signupEmail,
             userRole: signupRole,
           }),
-        }
+        },
       );
 
       const data = await response.json();
@@ -89,10 +89,14 @@ const page = () => {
 
       // Redirect to OTP page after 1.5 seconds
       setTimeout(() => {
-        router.push(`/otp?email=${encodeURIComponent(signupEmail)}&role=${signupRole}`);
+        router.push(
+          `/otp?email=${encodeURIComponent(signupEmail)}&role=${signupRole}`,
+        );
       }, 1500);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred during signup");
+      setError(
+        err instanceof Error ? err.message : "An error occurred during signup",
+      );
       setSuccess(false);
     } finally {
       setLoading(false);
@@ -104,7 +108,7 @@ const page = () => {
       <div>
         <Image src={HeroImage} alt="Hero Image" width={500} height={300} />
       </div>
-      <div className="px-4 py-3 space-y-10">
+      <div className="px-4 py-3 space-y-5">
         <div className="">
           <h4 className="text-lg font-bold">Create account</h4>
           <p className="text-(--lightText)">
@@ -114,7 +118,7 @@ const page = () => {
 
         <form className="space-y-5" onSubmit={handleSignup}>
           {/* Email input field */}
-          <div className="space-y-2 flex flex-col gap-0.5">
+          <div className="flex flex-col gap-1">
             <label htmlFor="email" className="font-semibold">
               University Email
             </label>
@@ -125,13 +129,13 @@ const page = () => {
               placeholder="name@uniport.edu.ng"
               value={form.email}
               onChange={handleChange}
-              className="bg-white border border-(--stroke) rounded-lg p-4.5"
+              className="bg-white border border-(--stroke) rounded-lg p-4.5 py-3"
               disabled={loading}
             />
           </div>
 
           {/* role input */}
-          <div className="space-y-2 flex flex-col gap-0.5">
+          <div className="flex flex-col gap-1">
             <label htmlFor="userRole" className="font-semibold">
               Account type
             </label>
@@ -139,7 +143,7 @@ const page = () => {
               id="userRole"
               value={form.userRole}
               onChange={handleChange}
-              className="bg-white border border-(--stroke) rounded-lg p-4.5"
+              className="bg-white border border-(--stroke) rounded-lg p-4.5 py-3"
               disabled={loading}
             >
               <option value="">Select your role</option>
@@ -195,15 +199,15 @@ const page = () => {
       {loginModal && (
         <div className=" fixed top-0 left-0 bg-black/80 h-screen w-full flex items-center justify-center p-4">
           <div className="bg-white rounded-lg p-6 w-full space-y-5">
-            <div className="space-y-2 flex flex-col gap-0.5">
-              <label htmlFor="loginRole" className="font-semibold text-sm">
+            <div className="flex flex-col gap-1">
+              <label htmlFor="loginRole" className="font-semibold">
                 Login as...
               </label>
               <select
                 id="loginRole"
                 value={loginRole}
                 onChange={(e) => setLoginRole(e.target.value as UserRole)}
-                className="bg-white border border-(--stroke) rounded-lg p-4.5"
+                className="bg-white border border-(--stroke) rounded-lg p-4.5 py-3"
               >
                 <option value="">Select your role</option>
                 <option value="student">Student</option>

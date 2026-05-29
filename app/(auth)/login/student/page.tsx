@@ -21,7 +21,7 @@ const page = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Validate inputs
     if (!form.email || !form.password) {
       setError("Email and password are required");
@@ -44,7 +44,7 @@ const page = () => {
             email: form.email,
             password: form.password,
           }),
-        }
+        },
       );
 
       const data = await response.json();
@@ -68,12 +68,12 @@ const page = () => {
     }
   };
   return (
-    <div className="flex flex-col flex-1 bg-(--background) h-screen space-y-6">
+    <div className="flex flex-col flex-1 bg-(--background) min-h-screen space-y-6">
       <div>
         <Image src={HeroImage} alt="Hero Image" width={500} height={300} />
       </div>
 
-      <div className="px-4 py-3 space-y-10">
+      <div className="px-4 py-3 space-y-5">
         <div className="space-y-2">
           <h4 className="text-xl font-bold">Student Login</h4>
           <p className=" text-(--ash)">
@@ -97,8 +97,8 @@ const page = () => {
           )}
 
           {/* email input field */}
-          <div className="space-y-2 flex flex-col gap-0.5">
-            <label htmlFor="email" className="font-semibold text-sm">
+          <div className="flex flex-col gap-1">
+            <label htmlFor="email" className="font-semibold">
               University Email
             </label>
             <input
@@ -108,15 +108,15 @@ const page = () => {
               value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
               disabled={loading}
-              className="bg-white border border-(--stroke) rounded-lg p-4.5 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-white border border-(--stroke) rounded-lg p-4.5 py-3 disabled:opacity-50 disabled:cursor-not-allowed"
             />
           </div>
           {/* password input field */}
-          <div className="space-y-2 flex flex-col gap-0.5">
-            <label htmlFor="password" className="font-semibold text-sm">
+          <div className="flex flex-col gap-1">
+            <label htmlFor="password" className="font-semibold">
               Password
             </label>
-            <div className="bg-white border border-(--stroke) rounded-lg p-4.5 flex items-center justify-between disabled:opacity-50 disabled:cursor-not-allowed">
+            <div className="bg-white border border-(--stroke) rounded-lg p-4.5 py-3 flex items-center justify-between disabled:opacity-50 disabled:cursor-not-allowed">
               <input
                 id="password"
                 type={visible ? "text" : "password"}
@@ -137,19 +137,19 @@ const page = () => {
           {/* forgot password button */}
           <Link
             href={"/forgot-password"}
-            className="float-right text-(--primary) text-sm"
+            className="float-right text-(--primary)"
           >
             Forgot password?
           </Link>
           {/* submit button */}
-          <Button 
-            text={loading ? "Logging In..." : "Log In"} 
-            type="submit" 
+          <Button
+            text={loading ? "Logging In..." : "Log In"}
+            type="submit"
             bgColor="primary"
             disabled={loading}
           />
           {/* sign up text */}
-          <p className="text-center text-sm">
+          <p className="text-center">
             Don't have an account?{" "}
             <Link href={"/signup"} className="text-(--primary)">
               Create Account

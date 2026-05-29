@@ -9,7 +9,7 @@ export default function Home() {
   const router = useRouter();
 
   return (
-    <main className="flex flex-col flex-1 items-center justify-center bg-(--background) h-screen space-y-10 p-4">
+    <main className="flex flex-col flex-1 items-center justify-center bg-(--background) h-screen space-y-5 p-4">
       <Image
         src={Illustration}
         alt="Order ride illustration"

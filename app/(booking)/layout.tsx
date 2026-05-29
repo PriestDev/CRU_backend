@@ -2,7 +2,7 @@ import { ReactNode } from "react"
 
 const layout = ({children} : {children: ReactNode}) => {
   return (
-    <div>layout</div>
+    <div className="bg-(--background) min-h-screen">{children}</div>
   )
 }
 
