@@ -4,8 +4,8 @@ interface PrivacyPolicyProps {
 
 const privacypolicy = ({ onClose }: PrivacyPolicyProps) => {
   return (
-    <div className=" w-screen h-screen fixed top-0 left-0 bg-black/50 p-4 rounded-lg overflow-scroll scrollbar-none">
-      <main className="p-4 space-y-4 bg-(--background)">
+    <div className=" w-screen h-screen fixed top-0 left-0 bg-black/50 p-4 overflow-scroll scrollbar-none">
+      <main className="p-4 space-y-4 bg-(--background) rounded-lg ">
         <div className="flex justify-between">
           <div>
             <h4 className="text-lg font-bold">Your privacy matters</h4>
