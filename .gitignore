@@ -24,6 +24,9 @@
 .DS_Store
 *.pem
 
+# root backend repo
+/backend
+
 # debug
 npm-debug.log*
 yarn-debug.log*
