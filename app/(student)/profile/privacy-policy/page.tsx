@@ -9,11 +9,6 @@ const page = () => {
       <div className="border-b border-(--stroke)">
         <PageHeader
           text="Privacy Policy"
-          extra={
-            <span className="material-symbols-outlined text-(--primary)">
-              edit
-            </span>
-          }
         />
       </div>
       <main className="p-4 space-y-4">
@@ -127,14 +122,14 @@ const page = () => {
             </p>
           </div>
           {/* support */}
-          <div className="bg-(--primary) text-white rounded-lg p-4 py-8 space-y-2">
+          {/* <div className="bg-(--primary) text-white rounded-lg p-4 py-8 space-y-2">
             <h4 className="text-sm font-bold">Questions?</h4>
             <p className="text-white/50">
               If you have concerns about your privacy or our data practices,
               please reach out to our privacy officer.
             </p>
             <Button text="Contact Support" bgColor="white" type="button" className="text-(--primary)"/>
-          </div>
+          </div> */}
         </div>
       </main>
     </div>

@@ -14,15 +14,15 @@ const page = () => {
         <PageHeader text="Help & Support" />
       </div>
       <div></div>
-      <div className="p-4 space-y-5">
+      <div className="p-4 space-y-4">
         {/* contact support */}
         <div className="space-y-2">
           <h4 className="font-bold uppercase text-(--lightText) tracking-wider">
             Quick Actions
           </h4>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="">
             {[
-              { title: "Live Chat", icon: "chat" },
+              // { title: "Live Chat", icon: "chat" },
               { title: "Report Issues", icon: "report" },
             ].map((action, index) => (
               <div
@@ -67,7 +67,7 @@ const page = () => {
           </div>
         </div>
         {/* email support */}
-        <div className="bg-(--primary) text-white rounded-lg p-4 py-8 space-y-2">
+        {/* <div className="bg-(--primary) text-white rounded-lg p-4 py-8 space-y-2">
           <h4 className="text-sm font-bold">Still need help?</h4>
           <p className="text-white/50">
             Our support team is available 24/7 for campus emergencies and ride
@@ -79,7 +79,7 @@ const page = () => {
             type="button"
             className="text-(--primary)"
           />
-        </div>
+        </div> */}
       </div>
     </div>
   );

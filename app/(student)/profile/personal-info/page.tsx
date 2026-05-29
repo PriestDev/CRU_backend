@@ -37,7 +37,7 @@ const page = () => {
           </div>
         </div>
         {/* form section */}
-        <form className="space-y-5">
+        <form className="space-y-4">
           {/* name input field */}
           <div className="flex flex-col gap-1">
             <label htmlFor="name" className="font-semibold">
@@ -64,6 +64,7 @@ const page = () => {
               defaultValue={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
               className="bg-white border border-(--stroke) rounded-lg p-4.5 py-3 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled
             />
           </div>
           {/* phone number input field */}
@@ -94,6 +95,7 @@ const page = () => {
               defaultValue={form.ID}
               onChange={(e) => setForm({ ...form, ID: e.target.value })}
               className="bg-white border border-(--stroke) rounded-lg p-4.5 py-3 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled
             />
           </div>
           {/* submit button */}

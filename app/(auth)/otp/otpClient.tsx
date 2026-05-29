@@ -171,7 +171,7 @@ export default function OtpPage() {
   return (
     <>
       <PageHeader text="OTP Verification" />
-      <div className="p-4 space-y-5 max-w-md mx-auto">
+      <div className="p-4 space-y-4 max-w-md mx-auto">
         <div className="space-y-2">
           <h4 className="text-xl font-bold">Verify your email</h4>
           <p className="text-(--ash)">
@@ -196,7 +196,7 @@ export default function OtpPage() {
           </div>
         )}
 
-        <form className="space-y-6" onSubmit={handleSubmit}>
+        <form className="space-y-4" onSubmit={handleSubmit}>
           <div className="flex justify-between gap-2 md:gap-4">
             {otp.map((data, index) => (
               <input

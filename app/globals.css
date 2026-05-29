@@ -5,13 +5,13 @@
 }
 
 :root {
-  --background: #F6F7F8;
-  --dark-text: #0F172A;
-  --primary: #137FEC;
-  --ash: #94A3B8;
-  --appRed: #DC2626;
-  --stroke: #CBD5E1;
-  --lightText: #64748B;
+  --background: #f6f7f8;
+  --dark-text: #0f172a;
+  --primary: #137fec;
+  --ash: #94a3b8;
+  --appRed: #dc2626;
+  --stroke: #cbd5e1;
+  --lightText: #64748b;
 }
 
 /* Force the body tag to use the Tailwind sans font utility */

@@ -108,7 +108,7 @@ const page = () => {
       <div>
         <Image src={HeroImage} alt="Hero Image" width={500} height={300} />
       </div>
-      <div className="px-4 py-3 space-y-5">
+      <div className="px-4 py-3 space-y-4">
         <div className="">
           <h4 className="text-lg font-bold">Create account</h4>
           <p className="text-(--lightText)">
@@ -116,7 +116,7 @@ const page = () => {
           </p>
         </div>
 
-        <form className="space-y-5" onSubmit={handleSignup}>
+        <form className="space-y-4" onSubmit={handleSignup}>
           {/* Email input field */}
           <div className="flex flex-col gap-1">
             <label htmlFor="email" className="font-semibold">
@@ -198,7 +198,7 @@ const page = () => {
 
       {loginModal && (
         <div className=" fixed top-0 left-0 bg-black/80 h-screen w-full flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg p-6 w-full space-y-5">
+          <div className="bg-white rounded-lg p-6 w-full space-y-4">
             <div className="flex flex-col gap-1">
               <label htmlFor="loginRole" className="font-semibold">
                 Login as...

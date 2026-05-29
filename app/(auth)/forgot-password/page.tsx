@@ -63,7 +63,7 @@ const page = () => {
   return (
     <>
       <PageHeader text="Forgot Password" />
-      <div className="p-4 space-y-5">
+      <div className="p-4 space-y-4">
         <div className="space-y-2">
           <h4 className="text-xl font-bold">Forgot Password</h4>
           <p className=" text-(--ash)">
@@ -86,7 +86,7 @@ const page = () => {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className=" space-y-5">
+        <form onSubmit={handleSubmit} className=" space-y-4">
           {/* email input field */}
           <div className="flex flex-col gap-1">
             <label htmlFor="email" className=" font-semibold text-sm">
@@ -111,7 +111,7 @@ const page = () => {
           />
         </form>
         {/* sign up text */}
-        <p className=" text-center text-sm">
+        <p className=" text-center">
           Remember your password?{" "}
           <Link href="/login/student" className="text-(--primary)">
             Back to login

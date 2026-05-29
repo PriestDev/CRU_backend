@@ -73,7 +73,7 @@ const page = () => {
         <Image src={HeroImage} alt="Hero Image" width={500} height={300} />
       </div>
 
-      <div className="px-4 py-3 space-y-5">
+      <div className="px-4 py-3 space-y-4">
         <div className="space-y-2">
           <h4 className="text-xl font-bold">Student Login</h4>
           <p className=" text-(--ash)">
@@ -81,7 +81,7 @@ const page = () => {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-4">
           {/* Error Message */}
           {error && (
             <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
