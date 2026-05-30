@@ -52,7 +52,7 @@ const page = () => {
                 }}
                 className={`py-4 cursor-pointer transition ${
                   index === activeSection
-                    ? "border-b-2 border-(--primary) font-bold text-black"
+                    ? "border-b-2 border-(--primary) text-(--primary) font-bold"
                     : "text-(--lightText)"
                 }`}
               >

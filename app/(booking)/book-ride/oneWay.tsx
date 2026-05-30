@@ -125,7 +125,7 @@ const OneWay = () => {
           value={note}
           onChange={(e) => setNote(e.target.value)}
           placeholder="e.g. Pick me up at hostel gate"
-          className="w-full border border-(--stroke) rounded-lg p-2"
+          className="w-full border border-(--stroke) rounded-lg p-2 focus:outline-(--primary)"
         />
       </div>
 
