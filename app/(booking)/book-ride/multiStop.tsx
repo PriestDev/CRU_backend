@@ -12,6 +12,7 @@ const MultiStop = () => {
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
   const [stops, setStops] = useState<Stop[]>([]);
+  const [note, setNote] = useState("");
 
   // Add stop (max 3)
   const addStop = () => {
@@ -54,13 +55,17 @@ const MultiStop = () => {
             <p className="text-[10px] text-(--ash) font-bold">From</p>
             <input
               type="text"
+              value={from}
+              onChange={(e) => setFrom(e.target.value)}
               placeholder="Current location"
               className="w-full border border-(--stroke) rounded-lg bg-white p-2 focus:outline-(--primary)"
             />
           </div>
 
           {/* DYNAMIC STOPS */}
-          <div className={`space-y-2 ${stops.length === 0 ? "hidden" : "block"}`}>
+          <div
+            className={`space-y-2 ${stops.length === 0 ? "hidden" : "block"}`}
+          >
             {stops.map((stop, index) => (
               <div key={stop.id} className="flex gap-2 items-center">
                 <span className=" text-(--ash)">Stop {index + 1}</span>
@@ -93,6 +98,8 @@ const MultiStop = () => {
             <p className="text-[10px] text-(--ash) font-bold">To</p>
             <input
               type="text"
+              value={to}
+              onChange={(e) => setTo(e.target.value)}
               placeholder="Destination"
               className="w-full border border-(--stroke) rounded-lg bg-white p-2 focus:outline-(--primary)"
             />
@@ -108,6 +115,18 @@ const MultiStop = () => {
       >
         + Add Stop
       </button>
+
+      {/* OPTIONAL NOTE */}
+      <div>
+        <p className="text-[10px] text-(--ash) font-bold">Note (optional)</p>
+        <textarea
+          rows={3}
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+          placeholder="e.g. Pick me up at hostel gate"
+          className="w-full border border-(--stroke) rounded-lg p-2"
+        />
+      </div>
 
       <Button type="submit" bgColor="primary" text="Find Ride" />
     </form>

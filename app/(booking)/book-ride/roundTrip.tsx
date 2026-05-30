@@ -6,6 +6,9 @@ import { useState } from "react";
 const RoundTrip = () => {
   const [rideType, setRideType] = useState<"standard" | "carpool">("standard");
   const [passengers, setPassengers] = useState(1);
+  const [note, setNote] = useState("");
+  const [from, setFrom] = useState("");
+  const [to, setTo] = useState("");
 
   const basePrice = 3000; // round trip is usually higher than one-way
 
@@ -29,6 +32,8 @@ const RoundTrip = () => {
             <p className="text-[10px] text-(--ash) font-bold">From</p>
             <input
               type="text"
+              value={from}
+              onChange={(e) => setFrom(e.target.value)}
               placeholder="Current location"
               className="w-full border border-(--stroke) rounded-lg bg-white p-2 focus:outline-(--primary)"
             />
@@ -38,6 +43,8 @@ const RoundTrip = () => {
             <p className="text-[10px] text-(--ash) font-bold">To</p>
             <input
               type="text"
+              value={to}
+              onChange={(e) => setTo(e.target.value)}
               placeholder="Destination"
               className="w-full border border-(--stroke) rounded-lg bg-white p-2 focus:outline-(--primary)"
             />
@@ -123,6 +130,18 @@ const RoundTrip = () => {
         {rideType === "carpool" && (
           <span className="text-(--ash)"> (shared among {passengers})</span>
         )}
+      </div>
+
+      {/* OPTIONAL NOTE */}
+      <div>
+        <p className="text-[10px] text-(--ash) font-bold">Note (optional)</p>
+        <textarea
+          rows={3}
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+          placeholder="e.g. Pick me up at hostel gate"
+          className="w-full border border-(--stroke) rounded-lg p-2"
+        />
       </div>
 
       <Button type="submit" bgColor="primary" text="Check Ride" />

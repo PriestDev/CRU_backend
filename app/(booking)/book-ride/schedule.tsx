@@ -35,6 +35,8 @@ const Schedule = () => {
             <input
               type="text"
               placeholder="Curent location"
+              value={from}
+              onChange={(e) => setFrom(e.target.value)}
               className="w-full border border-(--stroke) rounded-lg bg-white p-2 focus:outline-(--primary)"
             />{" "}
           </div>{" "}
@@ -45,6 +47,8 @@ const Schedule = () => {
             </p>{" "}
             <input
               type="text"
+              value={to}
+              onChange={(e) => setTo(e.target.value)}
               placeholder="Destination"
               className="w-full border border-(--stroke) rounded-lg bg-white p-2 focus:outline-(--primary)"
             />{" "}
@@ -78,8 +82,8 @@ const Schedule = () => {
       {/* OPTIONAL NOTE */}
       <div>
         <p className="text-[10px] text-(--ash) font-bold">Note (optional)</p>
-        <input
-          type="text"
+        <textarea
+          rows={3}
           value={note}
           onChange={(e) => setNote(e.target.value)}
           placeholder="e.g. Pick me up at hostel gate"

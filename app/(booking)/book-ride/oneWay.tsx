@@ -7,6 +7,9 @@ import { useState } from "react";
 const OneWay = () => {
   const [rideType, setRideType] = useState<"standard" | "carpool">("standard");
   const [passengers, setPassengers] = useState(1);
+  const [note, setNote] = useState("");
+  const [from, setFrom] = useState("");
+  const [to, setTo] = useState("");
 
   const basePrice = 2000;
 
@@ -17,37 +20,32 @@ const OneWay = () => {
     <form className="space-y-4">
       {/* From / To */}
       <div className="flex gap-2 w-full">
-        
         <div className="flex flex-col justify-around items-center">
-          
           <div className=" w-2 h-2 rounded-full border-2 border-(--primary)"></div>
           <div className=" h-15 w-0.5 bg-(--stroke) rounded-full"></div>
           <span className="material-symbols-outlined text-(--primary)">
-            
             location_pin
           </span>
         </div>
         <div className="flex flex-col justify-between gap-3 w-full">
-          
           <div>
-            
             <p className=" text-[10px] capitalize text-(--ash) font-bold">
-              
               From
             </p>
             <input
               type="text"
+              value={from}
+              onChange={(e) => setFrom(e.target.value)}
               placeholder="Curent location"
               className="w-full border border-(--stroke) rounded-lg bg-white p-2 focus:outline-(--primary)"
             />
           </div>
           <div>
-            
-            <p className=" text-[10px] capitalize text-(--ash) font-bold">
-              To
-            </p>
+            <p className=" text-[10px] capitalize text-(--ash) font-bold">To</p>
             <input
               type="text"
+              value={to}
+              onChange={(e) => setTo(e.target.value)}
               placeholder="Destination"
               className="w-full border border-(--stroke) rounded-lg bg-white p-2 focus:outline-(--primary)"
             />
@@ -117,6 +115,18 @@ const OneWay = () => {
         {rideType === "carpool" && (
           <span className="text-(--ash)"> (shared among {passengers})</span>
         )}
+      </div>
+
+      {/* OPTIONAL NOTE */}
+      <div>
+        <p className="text-[10px] text-(--ash) font-bold">Note (optional)</p>
+        <textarea
+          rows={3}
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+          placeholder="e.g. Pick me up at hostel gate"
+          className="w-full border border-(--stroke) rounded-lg p-2"
+        />
       </div>
 
       <Button type="submit" bgColor="primary" text="Check Ride" />
