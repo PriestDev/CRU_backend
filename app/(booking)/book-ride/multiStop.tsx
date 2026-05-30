@@ -43,7 +43,7 @@ const MultiStop = () => {
       <div className="flex gap-2 w-full">
         <div className="flex flex-col justify-around items-center">
           <div className="w-2 h-2 rounded-full border-2 border-(--primary)"></div>
-          <div className="h-10 w-0.5 bg-(--stroke) rounded-full"></div>
+          <div className="h-15 w-0.5 bg-(--stroke) rounded-full"></div>
           <span className="material-symbols-outlined text-(--primary)">
             location_pin
           </span>
@@ -55,12 +55,12 @@ const MultiStop = () => {
             <input
               type="text"
               placeholder="Current location"
-              className="w-full focus:outline-0"
+              className="w-full border border-(--stroke) rounded-lg bg-white p-2 focus:outline-(--primary)"
             />
           </div>
 
           {/* DYNAMIC STOPS */}
-          <div className="space-y-2">
+          <div className={`space-y-2 ${stops.length === 0 ? "hidden" : "block"}`}>
             {stops.map((stop, index) => (
               <div key={stop.id} className="flex gap-2 items-center">
                 <span className=" text-(--ash)">Stop {index + 1}</span>
@@ -70,7 +70,7 @@ const MultiStop = () => {
                   value={stop.value}
                   onChange={(e) => updateStop(stop.id, e.target.value)}
                   placeholder="Enter stop location"
-                  className="flex-1 border border-(--stroke) rounded-lg p-2"
+                  className="flex-1 border border-(--stroke) rounded-lg bg-white p-2 focus:outline-(--primary)"
                 />
 
                 <button
@@ -94,7 +94,7 @@ const MultiStop = () => {
             <input
               type="text"
               placeholder="Destination"
-              className="w-full focus:outline-0"
+              className="w-full border border-(--stroke) rounded-lg bg-white p-2 focus:outline-(--primary)"
             />
           </div>
         </div>

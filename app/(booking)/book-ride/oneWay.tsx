@@ -17,43 +17,42 @@ const OneWay = () => {
     <form className="space-y-4">
       {/* From / To */}
       <div className="flex gap-2 w-full">
-        {" "}
+        
         <div className="flex flex-col justify-around items-center">
-          {" "}
-          <div className=" w-2 h-2 rounded-full border-2 border-(--primary)"></div>{" "}
-          <div className=" h-10 w-0.5 bg-(--stroke) rounded-full"></div>{" "}
+          
+          <div className=" w-2 h-2 rounded-full border-2 border-(--primary)"></div>
+          <div className=" h-15 w-0.5 bg-(--stroke) rounded-full"></div>
           <span className="material-symbols-outlined text-(--primary)">
-            {" "}
-            location_pin{" "}
-          </span>{" "}
-        </div>{" "}
+            
+            location_pin
+          </span>
+        </div>
         <div className="flex flex-col justify-between gap-3 w-full">
-          {" "}
+          
           <div>
-            {" "}
+            
             <p className=" text-[10px] capitalize text-(--ash) font-bold">
-              {" "}
-              From{" "}
-            </p>{" "}
+              
+              From
+            </p>
             <input
               type="text"
               placeholder="Curent location"
-              className="focus:outline-0 focus:border-none w-full"
-            />{" "}
-          </div>{" "}
-          <hr className="outline-0 border-(--stroke)" />{" "}
+              className="w-full border border-(--stroke) rounded-lg bg-white p-2 focus:outline-(--primary)"
+            />
+          </div>
           <div>
-            {" "}
+            
             <p className=" text-[10px] capitalize text-(--ash) font-bold">
               To
-            </p>{" "}
+            </p>
             <input
               type="text"
               placeholder="Destination"
-              className="focus:outline-0 focus:border-none w-full"
-            />{" "}
-          </div>{" "}
-        </div>{" "}
+              className="w-full border border-(--stroke) rounded-lg bg-white p-2 focus:outline-(--primary)"
+            />
+          </div>
+        </div>
       </div>
 
       {/* Ride Type */}
@@ -116,10 +115,7 @@ const OneWay = () => {
       <div className="font-bold text-(--primary)">
         Estimated Price: ₦{price}
         {rideType === "carpool" && (
-          <span className="text-(--ash)">
-            {" "}
-            (shared among {passengers})
-          </span>
+          <span className="text-(--ash)"> (shared among {passengers})</span>
         )}
       </div>
 

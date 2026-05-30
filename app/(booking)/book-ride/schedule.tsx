@@ -18,7 +18,7 @@ const Schedule = () => {
         <div className="flex flex-col justify-around items-center">
           {" "}
           <div className=" w-2 h-2 rounded-full border-2 border-(--primary)"></div>{" "}
-          <div className=" h-10 w-0.5 bg-(--stroke) rounded-full"></div>{" "}
+          <div className=" h-15 w-0.5 bg-(--stroke) rounded-full"></div>{" "}
           <span className="material-symbols-outlined text-(--primary)">
             {" "}
             location_pin{" "}
@@ -35,10 +35,9 @@ const Schedule = () => {
             <input
               type="text"
               placeholder="Curent location"
-              className="focus:outline-0 focus:border-none w-full"
+              className="w-full border border-(--stroke) rounded-lg bg-white p-2 focus:outline-(--primary)"
             />{" "}
           </div>{" "}
-          <hr className="outline-0 border-(--stroke)" />{" "}
           <div>
             {" "}
             <p className=" text-[10px] capitalize text-(--ash) font-bold">
@@ -47,7 +46,7 @@ const Schedule = () => {
             <input
               type="text"
               placeholder="Destination"
-              className="focus:outline-0 focus:border-none w-full"
+              className="w-full border border-(--stroke) rounded-lg bg-white p-2 focus:outline-(--primary)"
             />{" "}
           </div>{" "}
         </div>{" "}

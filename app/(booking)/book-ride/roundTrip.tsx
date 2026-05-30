@@ -18,7 +18,7 @@ const RoundTrip = () => {
       <div className="flex gap-2 w-full">
         <div className="flex flex-col justify-around items-center">
           <div className="w-2 h-2 rounded-full border-2 border-(--primary)"></div>
-          <div className="h-10 w-0.5 bg-(--stroke) rounded-full"></div>
+          <div className="h-15 w-0.5 bg-(--stroke) rounded-full"></div>
           <span className="material-symbols-outlined text-(--primary)">
             location_pin
           </span>
@@ -30,18 +30,16 @@ const RoundTrip = () => {
             <input
               type="text"
               placeholder="Current location"
-              className="w-full focus:outline-0"
+              className="w-full border border-(--stroke) rounded-lg bg-white p-2 focus:outline-(--primary)"
             />
           </div>
-
-          <hr className="border-(--stroke)" />
 
           <div>
             <p className="text-[10px] text-(--ash) font-bold">To</p>
             <input
               type="text"
               placeholder="Destination"
-              className="w-full focus:outline-0"
+              className="w-full border border-(--stroke) rounded-lg bg-white p-2 focus:outline-(--primary)"
             />
           </div>
         </div>
@@ -49,7 +47,6 @@ const RoundTrip = () => {
 
       {/* Return Trip Section */}
       <div className="space-y-2">
-
         <div className="grid grid-cols-2 gap-2">
           <div>
             <p className="text-[10px] text-(--ash) font-bold">Return Date</p>
