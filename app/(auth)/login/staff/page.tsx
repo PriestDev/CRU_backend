@@ -7,6 +7,7 @@ import { FaEyeSlash, FaEye } from "react-icons/fa6";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Button from "@/components/ui/button";
+import Input from "@/components/ui/input";
 
 const page = () => {
   const router = useRouter();
@@ -87,69 +88,55 @@ const page = () => {
           {/* Error Message */}
           {error && (
             <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-red-700 text-sm">{error}</p>
+              <p className="text-red-700">{error}</p>
             </div>
           )}
 
           {/* Success Message */}
           {successMessage && (
             <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-              <p className="text-green-700 text-sm">{successMessage}</p>
+              <p className="text-green-700">{successMessage}</p>
             </div>
           )}
 
           {/* email input field */}
-          <div className="flex flex-col gap-1">
-            <label htmlFor="email" className="font-semibold">
-              Staff Email
-            </label>
-            <input
-              id="email"
-              type="email"
-              placeholder="staff.name@uniport.edu.ng"
-              value={form.email}
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
-              disabled={loading}
-              className="bg-white border border-(--stroke) rounded-lg p-4.5 py-3 disabled:opacity-50 disabled:cursor-not-allowed"
-            />
-          </div>
+          <Input
+            id="email"
+            type="email"
+            label="Email"
+            placeholder="staff.name@uniport.edu.ng"
+            value={form.email}
+            onChange={(e) => setForm({ ...form, email: e.target.value })}
+            disabled={loading}
+          />
           {/* staff ID input field */}
-          <div className="flex flex-col gap-1">
-            <label htmlFor="staffID" className="font-semibold">
-              Staff ID
-            </label>
-            <input
-              id="staffID"
-              type="text"
-              placeholder="UP-0000-00"
-              value={form.staffID}
-              onChange={(e) => setForm({ ...form, staffID: e.target.value })}
-              disabled={loading}
-              className="bg-white border border-(--stroke) rounded-lg p-4.5 py-3 disabled:opacity-50 disabled:cursor-not-allowed"
-            />
-          </div>
+          <Input
+            id="id"
+            type="text"
+            label="Staff Id"
+            placeholder="UP-0000-00"
+            value={form.staffID}
+            onChange={(e) => setForm({ ...form, staffID: e.target.value })}
+            disabled={loading}
+          />
           {/* password input field */}
-          <div className="flex flex-col gap-1">
-            <label htmlFor="password" className="font-semibold">
-              Password
-            </label>
-            <div className="bg-white border border-(--stroke) rounded-lg p-4.5 py-3 flex items-center justify-between">
-              <input
-                id="password"
-                type={visible ? "text" : "password"}
-                placeholder="Enter your password"
-                value={form.password}
-                onChange={(e) => setForm({ ...form, password: e.target.value })}
-                disabled={loading}
-                className="w-full focus:border-0 focus:outline-0 disabled:opacity-50 disabled:cursor-not-allowed"
-              />
-              <div
-                onClick={() => setVisible(!visible)}
-                className="text-(--ash) cursor-pointer"
-              >
-                {visible ? <FaEyeSlash /> : <FaEye />}
-              </div>
-            </div>
+          <div className="relative">
+            <Input
+              id="password"
+              type={visible ? "text" : "password"}
+              label="Password"
+              placeholder="Enter your password"
+              value={form.password}
+              onChange={(e) => setForm({ ...form, password: e.target.value })}
+              disabled={loading}
+            />
+            <button
+              onClick={() => setVisible(!visible)}
+              type="button"
+              className="absolute right-4 top-2/3 -translate-y-1/2 text-(--ash) cursor-pointer"
+            >
+              {visible ? <FaEyeSlash /> : <FaEye />}
+            </button>
           </div>
           {/* forgot password button */}
           <Link

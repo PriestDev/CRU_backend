@@ -185,14 +185,14 @@ export default function OtpPage() {
         {/* Error Message */}
         {error && (
           <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-red-700 text-sm">{error}</p>
+            <p className="text-red-700">{error}</p>
           </div>
         )}
 
         {/* Success Message */}
         {successMessage && (
           <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-            <p className="text-green-700 text-sm">{successMessage}</p>
+            <p className="text-green-700">{successMessage}</p>
           </div>
         )}
 

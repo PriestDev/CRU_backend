@@ -64,13 +64,10 @@ const page = () => {
     <>
       <PageHeader text="Forgot Password" />
       <div className="p-4 space-y-4">
-        <div className="space-y-2">
-          <h4 className="text-xl font-bold">Forgot Password</h4>
-          <p className=" text-(--ash)">
-            Enter your registered email address to receive a secure password
-            reset link.
-          </p>
-        </div>
+        <p className=" text-(--ash)">
+          Enter your registered email address to receive a secure password reset
+          link.
+        </p>
 
         {/* Error message */}
         {error && (

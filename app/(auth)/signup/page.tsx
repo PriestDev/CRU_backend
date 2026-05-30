@@ -6,6 +6,7 @@ import HeroImage from "../../../assets/staff.png";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Button from "@/components/ui/button";
+import Input from "@/components/ui/input";
 import PrivacyPolicy from "./privacypolicy";
 
 type UserRole = "staff" | "student" | "visitor";
@@ -120,21 +121,16 @@ const page = () => {
 
         <form className="space-y-4" onSubmit={handleSignup}>
           {/* Email input field */}
-          <div className="flex flex-col gap-1">
-            <label htmlFor="email" className="font-semibold">
-              University Email
-            </label>
-            <input
-              id="email"
-              type="email"
-              required
-              placeholder="name@uniport.edu.ng"
-              value={form.email}
-              onChange={handleChange}
-              className="bg-white border border-(--stroke) rounded-lg p-4.5 py-3"
-              disabled={loading}
-            />
-          </div>
+          <Input
+            id="email"
+            label="Email"
+            type="email"
+            placeholder="name@domain.com"
+            value={form.email}
+            onChange={handleChange}
+            disabled={loading}
+            required={true}
+          />
 
           {/* role input */}
           <div className="flex flex-col gap-1">
@@ -245,7 +241,9 @@ const page = () => {
           </div>
         </div>
       )}
-      {privacyPolicy && <PrivacyPolicy onClose={()=> setPrivacyPolicy(false)}/>}
+      {privacyPolicy && (
+        <PrivacyPolicy onClose={() => setPrivacyPolicy(false)} />
+      )}
     </>
   );
 };

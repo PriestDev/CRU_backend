@@ -24,7 +24,7 @@ const Button = ({ text, onClick, type, bgColor, className, disabled }: buttonPro
       type={type}
       disabled={disabled}
       // Removed hardcoded text sizes/colors so your custom className works
-      className={`rounded-xl w-full font-bold transition-colors p-3.5 ${selectedBg} ${className || ""} ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
+      className={`rounded-xl w-full font-bold transition-colors p-3.5 cursor-pointer ${selectedBg} ${className || ""} ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
       onClick={onClick}
     >
       {text}

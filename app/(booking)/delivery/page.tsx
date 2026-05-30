@@ -3,6 +3,8 @@
 import PageHeader from "@/components/layout/pageHeader";
 import { useState } from "react";
 import Button from "@/components/ui/button";
+import Input from "@/components/ui/input";
+import TextBox from "@/components/ui/textBox";
 
 const page = () => {
   const [deliveryIndex, setDeliveryIndex] = useState<number>(0);
@@ -18,29 +20,19 @@ const page = () => {
           </h4>
           <div className="space-y-4">
             {/* pickup field */}
-            <div className="flex flex-col gap-1">
-              <label htmlFor="pickup" className="font-semibold">
-                Pickup Location
-              </label>
-              <input
-                id="pickup"
-                type="text"
-                placeholder="Select pickup location..."
-                className="bg-white border border-(--stroke) rounded-lg p-4.5 py-3 disabled:opacity-50 disabled:cursor-not-allowed"
-              />
-            </div>
+            <Input
+              id="pickup"
+              label="Pickup Location"
+              placeholder="Select pickup location..."
+              type="text"
+            />
             {/* dropoff field */}
-            <div className="flex flex-col gap-1">
-              <label htmlFor="dropoff" className="font-semibold">
-                Dropoff Location
-              </label>
-              <input
-                id="dropoff"
-                type="text"
-                placeholder="Select dropoff location..."
-                className="bg-white border border-(--stroke) rounded-lg p-4.5 py-3 disabled:opacity-50 disabled:cursor-not-allowed"
-              />
-            </div>
+            <Input
+              id="dropoff"
+              label="Dropoff Location"
+              placeholder="Select dropoff location..."
+              type="text"
+            />
           </div>
         </div>
         <div className="space-y-2">
@@ -66,17 +58,11 @@ const page = () => {
               ))}
             </div>
             {/* rider note field */}
-            <div className="flex flex-col gap-1">
-              <label htmlFor="note" className="font-semibold">
-                Notes for rider
-              </label>
-              <textarea
-                id="note"
-                placeholder="Order #1, Please leave with Cynthia from room 005."
-                rows={5}
-                className="bg-white border border-(--stroke) rounded-lg p-4.5 py-3 disabled:opacity-50 disabled:cursor-not-allowed"
-              />
-            </div>
+            <TextBox
+              id="note"
+              label="Note for rider"
+              placeholder="Order #1, Please leave with Cynthia from room 005."
+            />
             {/* delivery cost */}
             <div className=" bg-(--primary)/5 rounded-lg p-4 flex items-center justify-between border border-(--stroke)">
               <div>

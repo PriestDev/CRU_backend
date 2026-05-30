@@ -6,6 +6,7 @@ import Button from "@/components/ui/button";
 import PageHeader from "@/components/layout/pageHeader";
 import { FaEyeSlash, FaEye } from "react-icons/fa";
 import { Suspense } from "react";
+import Input from "@/components/ui/input";
 
 const ResetPasswordPage = () => {
   const router = useRouter();
@@ -92,12 +93,9 @@ const ResetPasswordPage = () => {
     <>
       <PageHeader text="Reset Password" />
       <div className="p-4 space-y-4">
-        <div className="space-y-2">
-          <h4 className="text-xl font-bold">Reset Your Password</h4>
-          <p className="text-(--ash)">
-            Enter your new password below. Make sure it's secure and unique.
-          </p>
-        </div>
+        <p className="text-(--ash)">
+          Enter your new password below. Make sure it's secure and unique.
+        </p>
 
         {/* Error message */}
         {error && (
@@ -115,53 +113,42 @@ const ResetPasswordPage = () => {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* New password input */}
-          <div className="flex flex-col gap-1">
-            <label htmlFor="newPassword" className="font-semibold">
-              New Password
-            </label>
-            <div className="relative">
-              <input
-                id="newPassword"
-                type={showPassword ? "text" : "password"}
-                placeholder="Enter new password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                disabled={loading}
-                className="w-full bg-white border border-(--stroke) rounded-lg p-4.5 disabled:opacity-50 disabled:cursor-not-allowed"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-4 text-(--ash)"
-              >
-                {showPassword ? <FaEye /> : <FaEyeSlash />}
-              </button>
-            </div>
+          <div className="relative">
+            <Input
+              id="newPassword"
+              label="New Password"
+              type={showPassword ? "text" : "password"}
+              placeholder="Enter new password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              disabled={loading}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-4 top-2/3 -translate-y-1/2 text-(--ash)"
+            >
+              {showPassword ? <FaEye /> : <FaEyeSlash />}
+            </button>
           </div>
-
-          {/* Confirm password input */}
-          <div className="flex flex-col gap-1">
-            <label htmlFor="confirmPassword" className="font-semibold">
-              Confirm Password
-            </label>
-            <div className="relative">
-              <input
-                id="confirmPassword"
-                type={showConfirmPassword ? "text" : "password"}
-                placeholder="Confirm new password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                disabled={loading}
-                className="w-full bg-white border border-(--stroke) rounded-lg p-4.5 disabled:opacity-50 disabled:cursor-not-allowed"
-              />
-              <button
-                type="button"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-4 top-4 text-(--ash)"
-              >
-                {showConfirmPassword ? <FaEye /> : <FaEyeSlash />}
-              </button>
-            </div>
+          {/* confirm password input */}
+          <div className="relative">
+            <Input
+              id="confirmPassword"
+              label="Confirm Password"
+              type={showConfirmPassword ? "text" : "password"}
+              placeholder="Confirm new password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              disabled={loading}
+            />
+            <button
+              type="button"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              className="absolute right-4 top-2/3 -translate-y-1/2 text-(--ash)"
+            >
+              {showConfirmPassword ? <FaEye /> : <FaEyeSlash />}
+            </button>
           </div>
 
           {/* Submit button */}
@@ -174,7 +161,7 @@ const ResetPasswordPage = () => {
         </form>
 
         {/* Back to login */}
-        <p className="text-center text-sm">
+        <p className="text-center">
           <button
             onClick={() => router.push("/login/student")}
             className="text-(--primary) hover:underline"

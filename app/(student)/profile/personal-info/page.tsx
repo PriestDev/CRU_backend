@@ -4,6 +4,7 @@ import Image from "next/image";
 import PageHeader from "@/components/layout/pageHeader";
 import { useState } from "react";
 import Button from "@/components/ui/button";
+import Input from "@/components/ui/input";
 
 const page = () => {
   const [form, setForm] = useState({
@@ -39,65 +40,13 @@ const page = () => {
         {/* form section */}
         <form className="space-y-4">
           {/* name input field */}
-          <div className="flex flex-col gap-1">
-            <label htmlFor="name" className="font-semibold">
-              Full Name
-            </label>
-            <input
-              id="name"
-              type="text"
-              placeholder="Enter fullname"
-              defaultValue={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-              className="bg-white border border-(--stroke) rounded-lg p-4.5 py-3 disabled:opacity-50 disabled:cursor-not-allowed"
-            />
-          </div>
+          <Input id="name" label="Full Name" type="text" placeholder="Enter fullname" value={form.name} onChange={(e) => setForm({...form, name: e.target.value})} />
           {/* email input field */}
-          <div className="flex flex-col gap-1">
-            <label htmlFor="email" className="font-semibold">
-              Email
-            </label>
-            <input
-              id="email"
-              type="email"
-              placeholder="Enter your university email"
-              defaultValue={form.email}
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
-              className="bg-white border border-(--stroke) rounded-lg p-4.5 py-3 disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled
-            />
-          </div>
+          <Input id="email" label="Email" type="email" placeholder="Enter your email" value={form.email} onChange={(e) => setForm({...form, email: e.target.value})} disabled={true} />
           {/* phone number input field */}
-          <div className="flex flex-col gap-1">
-            <label htmlFor="number" className="font-semibold">
-              Phone Number
-            </label>
-            <input
-              id="number"
-              type="text"
-              placeholder="Enter your phone number"
-              defaultValue={form.phoneNumber}
-              onChange={(e) =>
-                setForm({ ...form, phoneNumber: e.target.value })
-              }
-              className="bg-white border border-(--stroke) rounded-lg p-4.5 py-3 disabled:opacity-50 disabled:cursor-not-allowed"
-            />
-          </div>
+          <Input id="number" label="Phone Number" type="text" placeholder="Enter your phone number" value={form.phoneNumber} onChange={(e)=>setForm({...form, phoneNumber: e.target.value})} />
           {/* id input field */}
-          <div className="flex flex-col gap-1">
-            <label htmlFor="id" className="font-semibold">
-              Campus ID
-            </label>
-            <input
-              id="id"
-              type="text"
-              placeholder="Enter your campus ID"
-              defaultValue={form.ID}
-              onChange={(e) => setForm({ ...form, ID: e.target.value })}
-              className="bg-white border border-(--stroke) rounded-lg p-4.5 py-3 disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled
-            />
-          </div>
+          <Input id="id" label="Campus ID" type="text" placeholder="Enter your cmpus ID" value={form.ID} onChange={(e)=>setForm({...form, ID: e.target.value})} disabled={true} />
           {/* submit button */}
           <Button text="Save Changes" type="submit" bgColor="primary" />
         </form>
