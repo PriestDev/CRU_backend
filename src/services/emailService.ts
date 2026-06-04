@@ -10,7 +10,26 @@ const smtpPort = parseInt(process.env.SMTP_PORT || (smtpHost.includes('gmail') ?
 const smtpSecure = process.env.SMTP_SECURE
   ? process.env.SMTP_SECURE === 'true'
   : smtpPort === 465;
-const sendgridFrom = process.env.SENDGRID_FROM || smtpUser || 'no-reply@campusride.com';
+const sendgridFromValue = process.env.SENDGRID_FROM || smtpUser || 'no-reply@campusride.com';
+
+const parseSender = (value: string) => {
+  const trimmed = value.trim();
+  const displayRegex = /^(?:(?:"?([^\"]*)"?)\s*)?<([^>]+)>$/;
+  const match = trimmed.match(displayRegex);
+
+  if (match) {
+    const name = match[1]?.trim();
+    const email = match[2].trim();
+    return { email, name: name || undefined };
+  }
+
+  return { email: trimmed };
+};
+
+const defaultSender = parseSender(sendgridFromValue);
+const sendgridFrom = defaultSender.name
+  ? { email: defaultSender.email, name: defaultSender.name }
+  : defaultSender.email;
 
 const useSendgrid = Boolean(sendgridApiKey);
 const isSmtpConfigured = Boolean(smtpUser && smtpPassword);
@@ -66,8 +85,10 @@ if (isSmtpConfigured && transporter) {
   });
 }
 
+type MailSender = string | { email: string; name?: string };
+
 const sendEmail = async (mailOptions: {
-  from: string;
+  from: MailSender;
   to: string;
   subject: string;
   html: string;
@@ -90,7 +111,17 @@ const sendEmail = async (mailOptions: {
     throw new Error('SMTP transporter is not configured');
   }
 
-  return transporter.sendMail(mailOptions);
+  const transporterOptions = {
+    ...mailOptions,
+    from:
+      typeof mailOptions.from === 'string'
+        ? mailOptions.from
+        : mailOptions.from.name
+        ? { name: mailOptions.from.name, address: mailOptions.from.email }
+        : mailOptions.from.email,
+  };
+
+  return transporter.sendMail(transporterOptions);
 };
 
 interface SendOTPEmailOptions {
@@ -112,7 +143,7 @@ export const sendOTPEmail = async ({
     const htmlContent = generateOTPEmail(otp, userRole);
 
     const mailOptions = {
-      from: `"Campus Ride Uniport" <${sendgridFrom}>`,
+      from: sendgridFrom,
       to: email,
       subject: '🔐 Your Campus Ride OTP Verification Code',
       html: htmlContent,
@@ -147,7 +178,7 @@ export const sendWelcomeEmail = async ({
     const htmlContent = generateWelcomeEmail(email, password, userRole);
 
     const mailOptions = {
-      from: `"Campus Ride Uniport" <${sendgridFrom}>`,
+      from: sendgridFrom,
       to: email,
       subject: '🎉 Welcome to Campus Ride - Your Account is Ready!',
       html: htmlContent,
@@ -180,7 +211,7 @@ export const sendPasswordResetEmail = async ({
     const htmlContent = generatePasswordResetEmail(resetToken);
 
     const mailOptions = {
-      from: `"Campus Ride Uniport" <${sendgridFrom}>`,
+      from: sendgridFrom,
       to: email,
       subject: '🔐 Password Reset Request for Campus Ride',
       html: htmlContent,
