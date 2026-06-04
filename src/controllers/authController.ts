@@ -67,11 +67,11 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
     }
 
     // Validate user role
-    const validRoles = ['student', 'staff', 'visitor'];
+    const validRoles = ['student', 'staff', 'driver', 'visitor'];
     if (!validRoles.includes(userRole)) {
       res.status(400).json({
         success: false,
-        message: 'Invalid user role. Must be student, staff, or visitor',
+        message: 'Invalid user role. Must be student, staff, driver, or visitor',
       });
       return;
     }
