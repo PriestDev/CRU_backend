@@ -1,45 +1,51 @@
 import nodemailer from 'nodemailer';
 import { generateOTPEmail, generateWelcomeEmail, generatePasswordResetEmail } from './emailTemplates';
 
-const gmailUser = process.env.GMAIL_USER;
-const gmailPassword = process.env.GMAIL_APP_PASSWORD;
-const gmailHost = process.env.GMAIL_HOST || 'smtp.gmail.com';
-const gmailPort = parseInt(process.env.GMAIL_PORT || '465', 10);
-const gmailSecure = process.env.GMAIL_SECURE ? process.env.GMAIL_SECURE === 'true' : true;
+const smtpUser = process.env.SMTP_USER || process.env.GMAIL_USER;
+const smtpPassword = process.env.SMTP_PASSWORD || process.env.GMAIL_APP_PASSWORD;
+const smtpHost = process.env.SMTP_HOST || process.env.GMAIL_HOST || 'smtp.gmail.com';
+const smtpPort = parseInt(process.env.SMTP_PORT || (smtpHost.includes('gmail') ? '587' : '465'), 10);
+const smtpSecure = process.env.SMTP_SECURE
+  ? process.env.SMTP_SECURE === 'true'
+  : smtpPort === 465;
 
-if (!gmailUser || !gmailPassword) {
-  console.error('❌ Gmail configuration error: missing GMAIL_USER or GMAIL_APP_PASSWORD environment variables');
+if (!smtpUser || !smtpPassword) {
+  console.error('❌ SMTP configuration error: missing SMTP_USER/SMTP_PASSWORD or GMAIL_USER/GMAIL_APP_PASSWORD environment variables');
 }
 
-// Configure Gmail transporter
+// Configure SMTP transporter
 const transporter = nodemailer.createTransport({
-  host: gmailHost,
-  port: gmailPort,
-  secure: gmailSecure,
-  auth: gmailUser && gmailPassword ? { user: gmailUser, pass: gmailPassword } : undefined,
+  host: smtpHost,
+  port: smtpPort,
+  secure: smtpSecure,
+  auth: smtpUser && smtpPassword ? { user: smtpUser, pass: smtpPassword } : undefined,
+  requireTLS: !smtpSecure,
+  ignoreTLS: false,
   tls: {
     rejectUnauthorized: false,
   },
   connectionTimeout: 10000,
+  greetingTimeout: 10000,
+  socketTimeout: 10000,
 });
 
-const isGmailConfigured = Boolean(gmailUser && gmailPassword);
+const isSmtpConfigured = Boolean(smtpUser && smtpPassword);
 
-const assertGmailConfig = (): boolean => {
-  if (!isGmailConfigured) {
-    console.error('❌ Gmail configuration error: missing GMAIL_USER or GMAIL_APP_PASSWORD environment variables');
+const assertSmtpConfig = (): boolean => {
+  if (!isSmtpConfigured) {
+    console.error('❌ SMTP configuration error: missing SMTP_USER/SMTP_PASSWORD or GMAIL_USER/GMAIL_APP_PASSWORD environment variables');
     return false;
   }
   return true;
 };
 
 // Verify connection configuration only when credentials are present
-if (isGmailConfigured) {
+if (isSmtpConfigured) {
   transporter.verify((error, _success) => {
     if (error) {
-      console.log('❌ Gmail configuration error:', error);
+      console.log('❌ SMTP configuration error:', error);
     } else {
-      console.log('✅ Gmail SMTP server is ready to send emails');
+      console.log('✅ SMTP server is ready to send emails');
     }
   });
 }
@@ -55,7 +61,7 @@ export const sendOTPEmail = async ({
   otp,
   userRole,
 }: SendOTPEmailOptions): Promise<boolean> => {
-  if (!assertGmailConfig()) {
+  if (!assertSmtpConfig()) {
     return false;
   }
 
@@ -63,7 +69,7 @@ export const sendOTPEmail = async ({
     const htmlContent = generateOTPEmail(otp, userRole);
 
     const mailOptions = {
-      from: `"Campus Ride Uniport" <${process.env.GMAIL_USER}>`,
+      from: `"Campus Ride Uniport" <${smtpUser}>`,
       to: email,
       subject: '🔐 Your Campus Ride OTP Verification Code',
       html: htmlContent,
@@ -90,7 +96,7 @@ export const sendWelcomeEmail = async ({
   password,
   userRole,
 }: SendWelcomeEmailOptions): Promise<boolean> => {
-  if (!assertGmailConfig()) {
+  if (!assertSmtpConfig()) {
     return false;
   }
 
@@ -98,7 +104,7 @@ export const sendWelcomeEmail = async ({
     const htmlContent = generateWelcomeEmail(email, password, userRole);
 
     const mailOptions = {
-      from: `"Campus Ride Uniport" <${process.env.GMAIL_USER}>`,
+      from: `"Campus Ride Uniport" <${smtpUser}>`,
       to: email,
       subject: '🎉 Welcome to Campus Ride - Your Account is Ready!',
       html: htmlContent,
@@ -123,7 +129,7 @@ export const sendPasswordResetEmail = async ({
   email,
   resetToken,
 }: SendPasswordResetEmailOptions): Promise<boolean> => {
-  if (!assertGmailConfig()) {
+  if (!assertSmtpConfig()) {
     return false;
   }
 
@@ -131,7 +137,7 @@ export const sendPasswordResetEmail = async ({
     const htmlContent = generatePasswordResetEmail(resetToken);
 
     const mailOptions = {
-      from: `"Campus Ride Uniport" <${process.env.GMAIL_USER}>`,
+      from: `"Campus Ride Uniport" <${smtpUser}>`,
       to: email,
       subject: '🔐 Password Reset Request for Campus Ride',
       html: htmlContent,
