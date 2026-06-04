@@ -1,6 +1,8 @@
 import nodemailer from 'nodemailer';
+import sgMail from '@sendgrid/mail';
 import { generateOTPEmail, generateWelcomeEmail, generatePasswordResetEmail } from './emailTemplates';
 
+const sendgridApiKey = process.env.SENDGRID_API_KEY;
 const smtpUser = process.env.SMTP_USER || process.env.GMAIL_USER;
 const smtpPassword = process.env.SMTP_PASSWORD || process.env.GMAIL_APP_PASSWORD;
 const smtpHost = process.env.SMTP_HOST || process.env.GMAIL_HOST || 'smtp.gmail.com';
@@ -8,39 +10,53 @@ const smtpPort = parseInt(process.env.SMTP_PORT || (smtpHost.includes('gmail') ?
 const smtpSecure = process.env.SMTP_SECURE
   ? process.env.SMTP_SECURE === 'true'
   : smtpPort === 465;
+const sendgridFrom = process.env.SENDGRID_FROM || smtpUser || 'no-reply@campusride.com';
 
-if (!smtpUser || !smtpPassword) {
-  console.error('❌ SMTP configuration error: missing SMTP_USER/SMTP_PASSWORD or GMAIL_USER/GMAIL_APP_PASSWORD environment variables');
-}
-
-// Configure SMTP transporter
-const transporter = nodemailer.createTransport({
-  host: smtpHost,
-  port: smtpPort,
-  secure: smtpSecure,
-  auth: smtpUser && smtpPassword ? { user: smtpUser, pass: smtpPassword } : undefined,
-  requireTLS: !smtpSecure,
-  ignoreTLS: false,
-  tls: {
-    rejectUnauthorized: false,
-  },
-  connectionTimeout: 10000,
-  greetingTimeout: 10000,
-  socketTimeout: 10000,
-});
-
+const useSendgrid = Boolean(sendgridApiKey);
 const isSmtpConfigured = Boolean(smtpUser && smtpPassword);
 
-const assertSmtpConfig = (): boolean => {
-  if (!isSmtpConfigured) {
-    console.error('❌ SMTP configuration error: missing SMTP_USER/SMTP_PASSWORD or GMAIL_USER/GMAIL_APP_PASSWORD environment variables');
-    return false;
+if (useSendgrid) {
+  sgMail.setApiKey(sendgridApiKey as string);
+  console.log('✅ SendGrid configured, using SendGrid to send emails');
+} else if (isSmtpConfigured) {
+  console.log('✅ SMTP configured, using SMTP transporter to send emails');
+} else {
+  console.error('❌ Email configuration error: missing SENDGRID_API_KEY or SMTP_USER/SMTP_PASSWORD or GMAIL_USER/GMAIL_APP_PASSWORD environment variables');
+}
+
+// Configure SMTP transporter only when SMTP settings exist
+const transporter = isSmtpConfigured
+  ? nodemailer.createTransport({
+      host: smtpHost,
+      port: smtpPort,
+      secure: smtpSecure,
+      auth: { user: smtpUser, pass: smtpPassword },
+      requireTLS: !smtpSecure,
+      ignoreTLS: false,
+      tls: {
+        rejectUnauthorized: false,
+      },
+      connectionTimeout: 10000,
+      greetingTimeout: 10000,
+      socketTimeout: 10000,
+    })
+  : undefined;
+
+const assertEmailConfig = (): boolean => {
+  if (useSendgrid) {
+    return true;
   }
-  return true;
+
+  if (isSmtpConfigured) {
+    return true;
+  }
+
+  console.error('❌ Email configuration error: missing SENDGRID_API_KEY or SMTP_USER/SMTP_PASSWORD or GMAIL_USER/GMAIL_APP_PASSWORD environment variables');
+  return false;
 };
 
-// Verify connection configuration only when credentials are present
-if (isSmtpConfigured) {
+// Verify SMTP only when configured
+if (isSmtpConfigured && transporter) {
   transporter.verify((error, _success) => {
     if (error) {
       console.log('❌ SMTP configuration error:', error);
@@ -49,6 +65,33 @@ if (isSmtpConfigured) {
     }
   });
 }
+
+const sendEmail = async (mailOptions: {
+  from: string;
+  to: string;
+  subject: string;
+  html: string;
+  text: string;
+}) => {
+  if (useSendgrid) {
+    const message = {
+      from: mailOptions.from,
+      to: mailOptions.to,
+      subject: mailOptions.subject,
+      html: mailOptions.html,
+      text: mailOptions.text,
+    };
+
+    const [response] = await sgMail.send(message);
+    return response;
+  }
+
+  if (!transporter) {
+    throw new Error('SMTP transporter is not configured');
+  }
+
+  return transporter.sendMail(mailOptions);
+};
 
 interface SendOTPEmailOptions {
   email: string;
@@ -61,7 +104,7 @@ export const sendOTPEmail = async ({
   otp,
   userRole,
 }: SendOTPEmailOptions): Promise<boolean> => {
-  if (!assertSmtpConfig()) {
+  if (!assertEmailConfig()) {
     return false;
   }
 
@@ -69,15 +112,15 @@ export const sendOTPEmail = async ({
     const htmlContent = generateOTPEmail(otp, userRole);
 
     const mailOptions = {
-      from: `"Campus Ride Uniport" <${smtpUser}>`,
+      from: `"Campus Ride Uniport" <${sendgridFrom}>`,
       to: email,
       subject: '🔐 Your Campus Ride OTP Verification Code',
       html: htmlContent,
       text: `Your OTP is: ${otp}. This code expires in 10 minutes.`,
     };
 
-    const info = await transporter.sendMail(mailOptions);
-    console.log(`✅ OTP email sent to ${email}. Message ID: ${info.messageId}`);
+    await sendEmail(mailOptions);
+    console.log(`✅ OTP email sent to ${email}`);
     return true;
   } catch (error) {
     console.error(`❌ Failed to send OTP email to ${email}:`, error);
@@ -96,7 +139,7 @@ export const sendWelcomeEmail = async ({
   password,
   userRole,
 }: SendWelcomeEmailOptions): Promise<boolean> => {
-  if (!assertSmtpConfig()) {
+  if (!assertEmailConfig()) {
     return false;
   }
 
@@ -104,15 +147,15 @@ export const sendWelcomeEmail = async ({
     const htmlContent = generateWelcomeEmail(email, password, userRole);
 
     const mailOptions = {
-      from: `"Campus Ride Uniport" <${smtpUser}>`,
+      from: `"Campus Ride Uniport" <${sendgridFrom}>`,
       to: email,
       subject: '🎉 Welcome to Campus Ride - Your Account is Ready!',
       html: htmlContent,
       text: `Welcome to Campus Ride! Your temporary password is: ${password}. Please log in and change your password for security.`,
     };
 
-    const info = await transporter.sendMail(mailOptions);
-    console.log(`✅ Welcome email sent to ${email}. Message ID: ${info.messageId}`);
+    await sendEmail(mailOptions);
+    console.log(`✅ Welcome email sent to ${email}`);
     return true;
   } catch (error) {
     console.error(`❌ Failed to send welcome email to ${email}:`, error);
@@ -129,7 +172,7 @@ export const sendPasswordResetEmail = async ({
   email,
   resetToken,
 }: SendPasswordResetEmailOptions): Promise<boolean> => {
-  if (!assertSmtpConfig()) {
+  if (!assertEmailConfig()) {
     return false;
   }
 
@@ -137,15 +180,15 @@ export const sendPasswordResetEmail = async ({
     const htmlContent = generatePasswordResetEmail(resetToken);
 
     const mailOptions = {
-      from: `"Campus Ride Uniport" <${smtpUser}>`,
+      from: `"Campus Ride Uniport" <${sendgridFrom}>`,
       to: email,
       subject: '🔐 Password Reset Request for Campus Ride',
       html: htmlContent,
       text: `Reset your password here: ${process.env.FRONTEND_URL || 'http://localhost:3000'}/reset-password?token=${resetToken}. This link expires in 30 minutes.`,
     };
 
-    const info = await transporter.sendMail(mailOptions);
-    console.log(`✅ Password reset email sent to ${email}. Message ID: ${info.messageId}`);
+    await sendEmail(mailOptions);
+    console.log(`✅ Password reset email sent to ${email}`);
     return true;
   } catch (error) {
     console.error(`❌ Failed to send password reset email to ${email}:`, error);
