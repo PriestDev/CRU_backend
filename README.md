@@ -130,6 +130,24 @@ backend/
 | `JWT_SECRET` | JWT signing secret | `your_secret_key` |
 | `JWT_EXPIRY` | JWT expiration time | `24h` |
 | `CORS_ORIGIN` | Allowed CORS origin | `http://localhost:3000` |
+| `SENDGRID_API_KEY` | SendGrid API key | `SG.xxx` |
+| `SENDGRID_FROM` | Verified email sender | `Campus Ride <no-reply@campusride.com>` |
+| `SMTP_HOST` | SMTP server host | `smtp.gmail.com` |
+| `SMTP_PORT` | SMTP server port | `587` |
+| `SMTP_SECURE` | Use SMTPS / TLS | `false` |
+| `SMTP_USER` | SMTP username | `your@email.com` |
+| `SMTP_PASSWORD` | SMTP password | `your_smtp_password` |
+
+## 🚀 SendGrid setup
+1. Create a SendGrid account at https://sendgrid.com/ and verify your email address.
+2. In the SendGrid dashboard, create an API key with Mail Send permissions.
+3. Verify a sender identity or domain in SendGrid.
+4. Add these environment variables to your backend `.env` or Render secrets:
+   - `SENDGRID_API_KEY`
+   - `SENDGRID_FROM`
+5. Deploy or restart the backend.
+
+> If SendGrid is not configured, the backend falls back to SMTP using `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, and `SMTP_PASSWORD`.
 
 ## 📦 Dependencies
 
