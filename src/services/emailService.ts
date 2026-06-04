@@ -1,23 +1,48 @@
 import nodemailer from 'nodemailer';
 import { generateOTPEmail, generateWelcomeEmail, generatePasswordResetEmail } from './emailTemplates';
 
+const gmailUser = process.env.GMAIL_USER;
+const gmailPassword = process.env.GMAIL_APP_PASSWORD;
+const gmailHost = process.env.GMAIL_HOST || 'smtp.gmail.com';
+const gmailPort = parseInt(process.env.GMAIL_PORT || '465', 10);
+const gmailSecure = process.env.GMAIL_SECURE ? process.env.GMAIL_SECURE === 'true' : true;
+
+if (!gmailUser || !gmailPassword) {
+  console.error('❌ Gmail configuration error: missing GMAIL_USER or GMAIL_APP_PASSWORD environment variables');
+}
+
 // Configure Gmail transporter
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.GMAIL_USER || 'your-email@gmail.com',
-    pass: process.env.GMAIL_APP_PASSWORD || 'your-app-password',
+  host: gmailHost,
+  port: gmailPort,
+  secure: gmailSecure,
+  auth: gmailUser && gmailPassword ? { user: gmailUser, pass: gmailPassword } : undefined,
+  tls: {
+    rejectUnauthorized: false,
   },
+  connectionTimeout: 10000,
 });
 
-// Verify connection configuration
-transporter.verify((error, _success) => {
-  if (error) {
-    console.log('❌ Gmail configuration error:', error);
-  } else {
-    console.log('✅ Gmail SMTP server is ready to send emails');
+const isGmailConfigured = Boolean(gmailUser && gmailPassword);
+
+const assertGmailConfig = (): boolean => {
+  if (!isGmailConfigured) {
+    console.error('❌ Gmail configuration error: missing GMAIL_USER or GMAIL_APP_PASSWORD environment variables');
+    return false;
   }
-});
+  return true;
+};
+
+// Verify connection configuration only when credentials are present
+if (isGmailConfigured) {
+  transporter.verify((error, _success) => {
+    if (error) {
+      console.log('❌ Gmail configuration error:', error);
+    } else {
+      console.log('✅ Gmail SMTP server is ready to send emails');
+    }
+  });
+}
 
 interface SendOTPEmailOptions {
   email: string;
@@ -30,6 +55,10 @@ export const sendOTPEmail = async ({
   otp,
   userRole,
 }: SendOTPEmailOptions): Promise<boolean> => {
+  if (!assertGmailConfig()) {
+    return false;
+  }
+
   try {
     const htmlContent = generateOTPEmail(otp, userRole);
 
@@ -61,6 +90,10 @@ export const sendWelcomeEmail = async ({
   password,
   userRole,
 }: SendWelcomeEmailOptions): Promise<boolean> => {
+  if (!assertGmailConfig()) {
+    return false;
+  }
+
   try {
     const htmlContent = generateWelcomeEmail(email, password, userRole);
 
@@ -90,6 +123,10 @@ export const sendPasswordResetEmail = async ({
   email,
   resetToken,
 }: SendPasswordResetEmailOptions): Promise<boolean> => {
+  if (!assertGmailConfig()) {
+    return false;
+  }
+
   try {
     const htmlContent = generatePasswordResetEmail(resetToken);
 
