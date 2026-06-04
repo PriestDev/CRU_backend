@@ -11,8 +11,7 @@ export const initializeDB = async () => {
         email VARCHAR(255) UNIQUE NOT NULL,
         role ENUM('student', 'staff', 'driver', 'visitor') NOT NULL,
         password_hash VARCHAR(255),
-        first_name VARCHAR(100) DEFAULT NULL,
-        last_name VARCHAR(100) DEFAULT NULL,
+        full_name VARCHAR(255) DEFAULT NULL,
         phone_number VARCHAR(50) DEFAULT NULL,
         campus_id VARCHAR(100) DEFAULT NULL,
         profile_picture_url VARCHAR(255) DEFAULT NULL,
@@ -32,8 +31,7 @@ export const initializeDB = async () => {
 
     // Ensure additional profile columns exist for legacy installs
     const optionalUserColumns = [
-      { name: 'first_name', definition: 'VARCHAR(100) DEFAULT NULL' },
-      { name: 'last_name', definition: 'VARCHAR(100) DEFAULT NULL' },
+      { name: 'full_name', definition: 'VARCHAR(255) DEFAULT NULL' },
       { name: 'phone_number', definition: 'VARCHAR(50) DEFAULT NULL' },
       { name: 'campus_id', definition: 'VARCHAR(100) DEFAULT NULL' },
       { name: 'profile_picture_url', definition: 'VARCHAR(255) DEFAULT NULL' },
@@ -45,6 +43,17 @@ export const initializeDB = async () => {
         await connection.execute(`ALTER TABLE users ADD COLUMN ${column.name} ${column.definition}`);
       } catch (error: any) {
         if (error.code !== 'ER_DUP_FIELDNAME') {
+          throw error;
+        }
+      }
+    }
+
+    const droppedColumns = ['first_name', 'last_name'];
+    for (const column of droppedColumns) {
+      try {
+        await connection.execute(`ALTER TABLE users DROP COLUMN ${column}`);
+      } catch (error: any) {
+        if (error.code !== 'ER_CANT_DROP_FIELD_OR_KEY' && error.code !== 'ER_BAD_FIELD_ERROR') {
           throw error;
         }
       }

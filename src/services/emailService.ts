@@ -11,6 +11,7 @@ const smtpSecure = process.env.SMTP_SECURE
   ? process.env.SMTP_SECURE === 'true'
   : smtpPort === 465;
 const sendgridFromValue = process.env.SENDGRID_FROM || smtpUser || 'no-reply@campusride.com';
+const sendgridReplyToValue = process.env.SENDGRID_REPLY_TO || sendgridFromValue;
 
 const parseSender = (value: string) => {
   const trimmed = value.trim();
@@ -27,9 +28,13 @@ const parseSender = (value: string) => {
 };
 
 const defaultSender = parseSender(sendgridFromValue);
+const defaultReplyTo = parseSender(sendgridReplyToValue);
 const sendgridFrom = defaultSender.name
   ? { email: defaultSender.email, name: defaultSender.name }
   : defaultSender.email;
+const sendgridReplyTo = defaultReplyTo.name
+  ? { email: defaultReplyTo.email, name: defaultReplyTo.name }
+  : defaultReplyTo.email;
 
 const useSendgrid = Boolean(sendgridApiKey);
 const isSmtpConfigured = Boolean(smtpUser && smtpPassword);
@@ -87,6 +92,13 @@ if (isSmtpConfigured && transporter) {
 
 type MailSender = string | { email: string; name?: string };
 
+const normalizeMailSender = (sender: MailSender) =>
+  typeof sender === 'string'
+    ? sender
+    : sender.name
+    ? { name: sender.name, address: sender.email }
+    : sender.email;
+
 const sendEmail = async (mailOptions: {
   from: MailSender;
   to: string;
@@ -101,6 +113,10 @@ const sendEmail = async (mailOptions: {
       subject: mailOptions.subject,
       html: mailOptions.html,
       text: mailOptions.text,
+      replyTo: sendgridReplyTo,
+      headers: {
+        'X-SendGrid-Category': 'campus-ride',
+      },
     };
 
     const [response] = await sgMail.send(message);
@@ -113,12 +129,8 @@ const sendEmail = async (mailOptions: {
 
   const transporterOptions = {
     ...mailOptions,
-    from:
-      typeof mailOptions.from === 'string'
-        ? mailOptions.from
-        : mailOptions.from.name
-        ? { name: mailOptions.from.name, address: mailOptions.from.email }
-        : mailOptions.from.email,
+    from: normalizeMailSender(mailOptions.from),
+    replyTo: normalizeMailSender(sendgridReplyTo),
   };
 
   return transporter.sendMail(transporterOptions);
@@ -145,7 +157,7 @@ export const sendOTPEmail = async ({
     const mailOptions = {
       from: sendgridFrom,
       to: email,
-      subject: '🔐 Your Campus Ride OTP Verification Code',
+      subject: 'Your Campus Ride verification code',
       html: htmlContent,
       text: `Your OTP is: ${otp}. This code expires in 10 minutes.`,
     };
@@ -180,7 +192,7 @@ export const sendWelcomeEmail = async ({
     const mailOptions = {
       from: sendgridFrom,
       to: email,
-      subject: '🎉 Welcome to Campus Ride - Your Account is Ready!',
+      subject: 'Welcome to Campus Ride - Your account is ready',
       html: htmlContent,
       text: `Welcome to Campus Ride! Your temporary password is: ${password}. Please log in and change your password for security.`,
     };
@@ -213,7 +225,7 @@ export const sendPasswordResetEmail = async ({
     const mailOptions = {
       from: sendgridFrom,
       to: email,
-      subject: '🔐 Password Reset Request for Campus Ride',
+      subject: 'Campus Ride password reset request',
       html: htmlContent,
       text: `Reset your password here: ${process.env.FRONTEND_URL || 'http://localhost:3000'}/reset-password?token=${resetToken}. This link expires in 30 minutes.`,
     };
