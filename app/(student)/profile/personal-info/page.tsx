@@ -12,6 +12,7 @@ const page = () => {
     email: "alex.j@uniport.edu.ng",
     ID: "U-200001",
     phoneNumber: "+234 803 000 0000",
+    newPassword: "",
   });
 
   return (
@@ -47,6 +48,10 @@ const page = () => {
           <Input id="number" label="Phone Number" type="text" placeholder="Enter your phone number" value={form.phoneNumber} onChange={(e)=>setForm({...form, phoneNumber: e.target.value})} />
           {/* id input field */}
           <Input id="id" label="Campus ID" type="text" placeholder="Enter your cmpus ID" value={form.ID} onChange={(e)=>setForm({...form, ID: e.target.value})} disabled={true} />
+          {/* new password input field */}
+          <Input id="newPassword" label="New Password" type="text" placeholder="Enter a new password" value={form.newPassword} onChange={(e)=>setForm({...form, newPassword: e.target.value})}/>
+          {/* confirm new password input field */}
+          <Input id="confirmNewPassword" label="Confirm New Password" type="text" placeholder="Confirm your new password" value={form.newPassword} onChange={(e)=>setForm({...form, newPassword: e.target.value})}/>
           {/* submit button */}
           <Button text="Save Changes" type="submit" bgColor="primary" />
         </form>
