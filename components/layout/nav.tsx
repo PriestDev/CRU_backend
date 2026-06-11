@@ -24,6 +24,15 @@ const nav = () => {
         <p className="">Activity</p>
       </Link>
 
+      {/* Wallet button */}
+      <Link
+        href="/wallet"
+        className={`flex flex-col items-center ${pathname === "/wallet" && "text-(--primary) font-semibold"}`}
+      >
+        <span className="material-symbols-outlined">wallet</span>
+        <p className="">Wallet</p>
+      </Link>
+
       {/* alerts button */}
       <Link
         href="/alert"
