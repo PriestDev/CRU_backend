@@ -86,6 +86,22 @@ export const initializeDB = async () => {
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     `);
 
+    // Create SOS alerts table if it doesn't exist
+    await connection.execute(`
+      CREATE TABLE IF NOT EXISTS sos_alerts (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        note TEXT DEFAULT NULL,
+        latitude DECIMAL(10,7) DEFAULT NULL,
+        longitude DECIMAL(10,7) DEFAULT NULL,
+        contacts_count INT NOT NULL DEFAULT 0,
+        contacts_snapshot JSON DEFAULT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        INDEX idx_sos_user (user_id),
+        CONSTRAINT fk_sos_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    `);
+
     // Create bookings table if it doesn't exist
     await connection.execute(`
       CREATE TABLE IF NOT EXISTS bookings (
@@ -181,6 +197,142 @@ export const initializeDB = async () => {
         CONSTRAINT fk_tracking_booking FOREIGN KEY (booking_id) REFERENCES bookings(id) ON DELETE CASCADE
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     `);
+
+    // Create delivery orders table if it doesn't exist
+    await connection.execute(`
+      CREATE TABLE IF NOT EXISTS deliveries (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT DEFAULT NULL,
+        delivery_type ENUM('food', 'docs', 'other') NOT NULL DEFAULT 'other',
+        pickup_location VARCHAR(255) NOT NULL,
+        dropoff_location VARCHAR(255) NOT NULL,
+        note TEXT DEFAULT NULL,
+        estimated_fee DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+        estimated_minutes INT NOT NULL DEFAULT 0,
+        status ENUM('pending', 'picked_up', 'in_transit', 'delivered', 'cancelled') NOT NULL DEFAULT 'pending',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        INDEX idx_delivery_status (status),
+        INDEX idx_delivery_user (user_id),
+        CONSTRAINT fk_delivery_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    `);
+
+    // Create wallet accounts table if it doesn't exist
+    await connection.execute(`
+      CREATE TABLE IF NOT EXISTS wallet_accounts (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        wallet_code VARCHAR(50) NOT NULL UNIQUE,
+        user_id INT DEFAULT NULL,
+        balance DECIMAL(12,2) NOT NULL DEFAULT 0.00,
+        currency CHAR(3) NOT NULL DEFAULT 'NGN',
+        status ENUM('active', 'frozen', 'closed') NOT NULL DEFAULT 'active',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        INDEX idx_wallet_user (user_id),
+        CONSTRAINT fk_wallet_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    `);
+
+    // Create wallet transactions table if it doesn't exist
+    await connection.execute(`
+      CREATE TABLE IF NOT EXISTS wallet_transactions (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        wallet_account_id INT NOT NULL,
+        user_id INT DEFAULT NULL,
+        transaction_type ENUM('fund', 'withdraw', 'payment', 'refund') NOT NULL,
+        amount DECIMAL(12,2) NOT NULL,
+        balance_before DECIMAL(12,2) NOT NULL,
+        balance_after DECIMAL(12,2) NOT NULL,
+        reference VARCHAR(100) NOT NULL,
+        description VARCHAR(255) DEFAULT NULL,
+        status ENUM('pending', 'completed', 'failed') NOT NULL DEFAULT 'completed',
+        metadata JSON DEFAULT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        INDEX idx_wallet_tx_wallet (wallet_account_id),
+        INDEX idx_wallet_tx_user (user_id),
+        INDEX idx_wallet_tx_type (transaction_type),
+        CONSTRAINT fk_wallet_tx_wallet FOREIGN KEY (wallet_account_id) REFERENCES wallet_accounts(id) ON DELETE CASCADE,
+        CONSTRAINT fk_wallet_tx_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    `);
+
+    // Wallet accounts are created on demand per authenticated user.
+
+    // Create carpools table if it doesn't exist
+    await connection.execute(`
+      CREATE TABLE IF NOT EXISTS carpools (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        trip_code VARCHAR(20) NOT NULL UNIQUE,
+        driver_name VARCHAR(255) NOT NULL,
+        driver_image VARCHAR(255) NOT NULL,
+        rating DECIMAL(2,1) NOT NULL DEFAULT 0.0,
+        total_rides INT NOT NULL DEFAULT 0,
+        from_location VARCHAR(255) NOT NULL,
+        to_location VARCHAR(255) NOT NULL,
+        departure_time TIME NOT NULL,
+        arrival_time TIME NOT NULL,
+        price_per_seat DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+        seats_total TINYINT UNSIGNED NOT NULL DEFAULT 4,
+        seats_booked TINYINT UNSIGNED NOT NULL DEFAULT 0,
+        vehicle_type VARCHAR(100) NOT NULL,
+        gender_preference ENUM('male', 'female', 'any') NOT NULL DEFAULT 'any',
+        music_allowed BOOLEAN NOT NULL DEFAULT true,
+        ac_available BOOLEAN NOT NULL DEFAULT false,
+        status ENUM('open', 'full', 'cancelled') NOT NULL DEFAULT 'open',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        INDEX idx_carpool_status (status),
+        INDEX idx_carpool_route (from_location, to_location)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    `);
+
+    await connection.execute(`
+      CREATE TABLE IF NOT EXISTS carpool_participants (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        carpool_id INT NOT NULL,
+        user_id INT DEFAULT NULL,
+        passenger_name VARCHAR(255) DEFAULT NULL,
+        seats_booked TINYINT UNSIGNED NOT NULL DEFAULT 1,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        INDEX idx_carpool_participant_carpool (carpool_id),
+        INDEX idx_carpool_participant_user (user_id),
+        CONSTRAINT fk_carpool_participant_carpool FOREIGN KEY (carpool_id) REFERENCES carpools(id) ON DELETE CASCADE,
+        CONSTRAINT fk_carpool_participant_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    `);
+
+    const [existingCarpoolRows] = await connection.execute(`SELECT COUNT(*) AS total FROM carpools`);
+    const existingCount = Array.isArray(existingCarpoolRows) && existingCarpoolRows.length > 0
+      ? Number((existingCarpoolRows[0] as any).total) || 0
+      : 0;
+
+    if (existingCount === 0) {
+      await connection.execute(
+        `INSERT INTO carpools (
+          trip_code,
+          driver_name,
+          driver_image,
+          rating,
+          total_rides,
+          from_location,
+          to_location,
+          departure_time,
+          arrival_time,
+          price_per_seat,
+          seats_total,
+          seats_booked,
+          vehicle_type,
+          gender_preference,
+          music_allowed,
+          ac_available,
+          status
+        ) VALUES
+          ('CP001', 'Alex Rivers', 'https://placehold.net/avatar-4.svg', 4.9, 124, 'Main Campus North Gate', 'Downtown Tech Hub', '08:30:00', '09:15:00', 5.50, 4, 2, 'Electric Keke', 'any', true, false, 'open'),
+          ('CP002', 'Sarah Miles', 'https://placehold.net/avatar-4.svg', 4.7, 89, 'Rumuola', 'GRA Phase 3', '07:45:00', '08:20:00', 8.00, 4, 3, 'Sedan', 'female', true, true, 'open')`
+      );
+    }
 
     console.log('✅ Database schema initialized successfully');
   } catch (error) {
