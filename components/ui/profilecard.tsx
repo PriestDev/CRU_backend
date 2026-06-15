@@ -1,0 +1,34 @@
+import Link from "next/link";
+
+interface ProfileCardProps {
+  title: string;
+  text: string;
+  icon: string;
+  link: string;
+}
+
+const profilecard = (props: ProfileCardProps) => {
+  return (
+    <Link
+      href={props.link}
+      className="flex items-center justify-between bg-white rounded-lg p-4"
+    >
+      <div className="flex items-center gap-4">
+        <div className="flex items-center justify-center w-10 h-10 shrink-0 rounded-lg bg-(--primary)/10 text-(--primary)">
+          <span className="material-symbols-outlined">{props.icon}</span>
+        </div>
+        <div>
+          <h4 className="font-bold text-sm">{props.title}</h4>
+          <p className="text-(--lightText)">{props.text}</p>
+        </div>
+      </div>
+      <div>
+        <span className="material-symbols-outlined text-(--lightText)">
+          keyboard_arrow_right
+        </span>
+      </div>
+    </Link>
+  );
+};
+
+export default profilecard;
