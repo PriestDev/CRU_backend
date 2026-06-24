@@ -1,9 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
+import jwt from 'jsonwebtoken';
 
 declare global {
   namespace Express {
     interface Request {
-      userId?: string;
+      userId?: number;
       user?: any;
       token?: string;
     }
@@ -27,16 +28,18 @@ export const authMiddleware = (
       return;
     }
 
-    // TODO: Verify JWT token
-    // const decoded = jwt.verify(token, process.env.JWT_SECRET!);
-    // req.userId = decoded.id;
-    // req.user = decoded;
+    // Verify JWT token
+    const jwtSecret = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+    const decoded = jwt.verify(token, jwtSecret) as any;
+    req.userId = decoded.id;
+    req.user = decoded;
+    req.token = token;
 
     next();
   } catch (error) {
     res.status(401).json({
       status: 'error',
-      message: 'Invalid token',
+      message: error instanceof jwt.TokenExpiredError ? 'Token has expired' : 'Invalid token',
       timestamp: new Date().toISOString(),
     });
   }
@@ -51,15 +54,42 @@ export const optionalAuth = (
     const token = req.headers.authorization?.split(' ')[1];
     
     if (token) {
-      // TODO: Verify JWT token
-      // const decoded = jwt.verify(token, process.env.JWT_SECRET!);
-      // req.userId = decoded.id;
-      // req.user = decoded;
+      // Verify JWT token
+      const jwtSecret = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+      const decoded = jwt.verify(token, jwtSecret) as any;
+      req.userId = decoded.id;
+      req.user = decoded;
+      req.token = token;
     }
 
     next();
   } catch (error) {
-    // Continue without authentication
+    // Continue without authentication even if token is invalid
     next();
+  }
+};
+
+export const adminOnlyMiddleware = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void => {
+  try {
+    if (!req.user || req.user.role !== 'staff') {
+      res.status(403).json({
+        status: 'error',
+        message: 'Access denied. Admin privileges required.',
+        timestamp: new Date().toISOString(),
+      });
+      return;
+    }
+
+    next();
+  } catch (error) {
+    res.status(403).json({
+      status: 'error',
+      message: 'Unauthorized access',
+      timestamp: new Date().toISOString(),
+    });
   }
 };

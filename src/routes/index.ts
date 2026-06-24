@@ -7,6 +7,10 @@ import deliveryRoutes from './deliveryRoutes';
 import emergencyContactsRoutes from './emergencyContactsRoutes';
 import walletRoutes from './walletRoutes';
 import userRoutes from './userRoutes';
+import notificationRoutes from './notificationRoutes';
+import adminRoutes from './adminRoutes';
+import ratingRoutes from './ratingRoutes';
+import trackingRoutes from './trackingRoutes';
 
 const router = Router();
 
@@ -31,7 +35,19 @@ router.use('/deliveries', deliveryRoutes);
 // Wallet Routes
 router.use('/wallet', walletRoutes);
 
+// Notification Routes
+router.use('/notifications', notificationRoutes);
+
 // Emergency Contacts Routes
 router.use('/emergency-contacts', emergencyContactsRoutes);
+
+// Rating Routes
+router.use('/ratings', ratingRoutes);
+
+// Tracking Routes
+router.use('/tracking', trackingRoutes);
+
+// Admin Routes
+router.use('/admin', adminRoutes);
 
 export default router;

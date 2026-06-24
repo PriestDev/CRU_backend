@@ -70,6 +70,23 @@ export const initializeDB = async () => {
       }
     }
 
+    // Create notifications table if it doesn't exist
+    await connection.execute(`
+      CREATE TABLE IF NOT EXISTS notifications (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        title VARCHAR(255) NOT NULL,
+        message TEXT NOT NULL,
+        type ENUM('ride', 'delivery', 'promo', 'system') NOT NULL,
+        is_read BOOLEAN NOT NULL DEFAULT false,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        INDEX idx_notification_user (user_id),
+        INDEX idx_notification_created (created_at),
+        CONSTRAINT fk_notification_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    `);
+
     // Create emergency contacts table if it doesn't exist
     await connection.execute(`
       CREATE TABLE IF NOT EXISTS emergency_contacts (
@@ -120,11 +137,60 @@ export const initializeDB = async () => {
         note TEXT DEFAULT NULL,
         estimated_price DECIMAL(10,2) NOT NULL DEFAULT 0.00,
         payment_status ENUM('pending', 'paid', 'failed', 'refunded') NOT NULL DEFAULT 'pending',
-        status ENUM('pending', 'confirmed', 'completed', 'cancelled') NOT NULL DEFAULT 'pending',
+        status ENUM('pending', 'confirmed', 'in_progress', 'completed', 'cancelled') NOT NULL DEFAULT 'pending',
+        start_request_status ENUM('idle', 'requested', 'approved', 'rejected') NOT NULL DEFAULT 'idle',
+        started_at DATETIME DEFAULT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         INDEX idx_booking_user (user_id),
         CONSTRAINT fk_booking_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    `);
+
+    try {
+      await connection.execute(`
+        ALTER TABLE bookings
+        MODIFY COLUMN status ENUM('pending', 'confirmed', 'in_progress', 'completed', 'cancelled') NOT NULL DEFAULT 'pending'
+      `);
+    } catch (error: any) {
+      if (error.code !== 'ER_BAD_FIELD_ERROR') {
+        throw error;
+      }
+    }
+
+    try {
+      await connection.execute(`
+        ALTER TABLE bookings
+        ADD COLUMN start_request_status ENUM('idle', 'requested', 'approved', 'rejected') NOT NULL DEFAULT 'idle'
+      `);
+    } catch (error: any) {
+      if (error.code !== 'ER_DUP_FIELDNAME') {
+        throw error;
+      }
+    }
+
+    try {
+      await connection.execute(`
+        ALTER TABLE bookings
+        ADD COLUMN started_at DATETIME DEFAULT NULL
+      `);
+    } catch (error: any) {
+      if (error.code !== 'ER_DUP_FIELDNAME') {
+        throw error;
+      }
+    }
+
+    await connection.execute(`
+      CREATE TABLE IF NOT EXISTS ride_start_approvals (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        booking_id INT NOT NULL,
+        user_id INT NOT NULL,
+        status ENUM('approved', 'rejected') NOT NULL DEFAULT 'approved',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        UNIQUE KEY uq_booking_user_approval (booking_id, user_id),
+        CONSTRAINT fk_ride_start_booking FOREIGN KEY (booking_id) REFERENCES bookings(id) ON DELETE CASCADE,
+        CONSTRAINT fk_ride_start_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     `);
 
@@ -264,6 +330,7 @@ export const initializeDB = async () => {
       CREATE TABLE IF NOT EXISTS carpools (
         id INT AUTO_INCREMENT PRIMARY KEY,
         trip_code VARCHAR(20) NOT NULL UNIQUE,
+        booking_id INT DEFAULT NULL,
         driver_name VARCHAR(255) NOT NULL,
         driver_image VARCHAR(255) NOT NULL,
         rating DECIMAL(2,1) NOT NULL DEFAULT 0.0,
@@ -273,7 +340,7 @@ export const initializeDB = async () => {
         departure_time TIME NOT NULL,
         arrival_time TIME NOT NULL,
         price_per_seat DECIMAL(10,2) NOT NULL DEFAULT 0.00,
-        seats_total TINYINT UNSIGNED NOT NULL DEFAULT 4,
+        seats_total TINYINT UNSIGNED NOT NULL DEFAULT 5,
         seats_booked TINYINT UNSIGNED NOT NULL DEFAULT 0,
         vehicle_type VARCHAR(100) NOT NULL,
         gender_preference ENUM('male', 'female', 'any') NOT NULL DEFAULT 'any',
@@ -283,9 +350,53 @@ export const initializeDB = async () => {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         INDEX idx_carpool_status (status),
-        INDEX idx_carpool_route (from_location, to_location)
+        INDEX idx_carpool_route (from_location, to_location),
+        INDEX idx_carpool_booking (booking_id),
+        CONSTRAINT fk_carpool_booking FOREIGN KEY (booking_id) REFERENCES bookings(id) ON DELETE SET NULL
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     `);
+
+    try {
+      await connection.execute(`
+        ALTER TABLE carpools MODIFY COLUMN seats_total TINYINT UNSIGNED NOT NULL DEFAULT 5
+      `);
+    } catch (error: any) {
+      if (error.code !== 'ER_BAD_FIELD_ERROR') {
+        throw error;
+      }
+    }
+
+    try {
+      await connection.execute(`
+        UPDATE carpools SET seats_total = GREATEST(seats_total, 5)
+      `);
+    } catch (error: any) {
+      // Ignore if the table is not ready yet or the query is not supported.
+      if (error.code !== 'ER_NO_SUCH_TABLE') {
+        throw error;
+      }
+    }
+
+    try {
+      await connection.execute(`
+        ALTER TABLE carpools ADD COLUMN booking_id INT DEFAULT NULL
+      `);
+    } catch (error: any) {
+      if (error.code !== 'ER_DUP_FIELDNAME') {
+        throw error;
+      }
+    }
+
+    try {
+      await connection.execute(`
+        ALTER TABLE carpools
+        ADD CONSTRAINT fk_carpool_booking FOREIGN KEY (booking_id) REFERENCES bookings(id) ON DELETE SET NULL
+      `);
+    } catch (error: any) {
+      if (error.code !== 'ER_DUP_KEYNAME' && error.code !== 'ER_CANNOT_ADD_FOREIGN' && error.code !== 'ER_CANT_CREATE_TABLE') {
+        throw error;
+      }
+    }
 
     await connection.execute(`
       CREATE TABLE IF NOT EXISTS carpool_participants (
@@ -302,37 +413,6 @@ export const initializeDB = async () => {
         CONSTRAINT fk_carpool_participant_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     `);
-
-    const [existingCarpoolRows] = await connection.execute(`SELECT COUNT(*) AS total FROM carpools`);
-    const existingCount = Array.isArray(existingCarpoolRows) && existingCarpoolRows.length > 0
-      ? Number((existingCarpoolRows[0] as any).total) || 0
-      : 0;
-
-    if (existingCount === 0) {
-      await connection.execute(
-        `INSERT INTO carpools (
-          trip_code,
-          driver_name,
-          driver_image,
-          rating,
-          total_rides,
-          from_location,
-          to_location,
-          departure_time,
-          arrival_time,
-          price_per_seat,
-          seats_total,
-          seats_booked,
-          vehicle_type,
-          gender_preference,
-          music_allowed,
-          ac_available,
-          status
-        ) VALUES
-          ('CP001', 'Alex Rivers', 'https://placehold.net/avatar-4.svg', 4.9, 124, 'Main Campus North Gate', 'Downtown Tech Hub', '08:30:00', '09:15:00', 5.50, 4, 2, 'Electric Keke', 'any', true, false, 'open'),
-          ('CP002', 'Sarah Miles', 'https://placehold.net/avatar-4.svg', 4.7, 89, 'Rumuola', 'GRA Phase 3', '07:45:00', '08:20:00', 8.00, 4, 3, 'Sedan', 'female', true, true, 'open')`
-      );
-    }
 
     console.log('✅ Database schema initialized successfully');
   } catch (error) {

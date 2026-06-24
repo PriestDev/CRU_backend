@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import bcryptjs from 'bcryptjs';
 import crypto from 'crypto';
+import jwt from 'jsonwebtoken';
 import pool from '../config/database';
 import { sendOTPEmail, sendWelcomeEmail, sendPasswordResetEmail } from '../services/emailService';
 
@@ -37,6 +38,22 @@ const getClientIP = (req: Request): string => {
          (req.headers['x-real-ip'] as string) || 
          req.ip || 
          'unknown';
+};
+
+// Generate JWT token
+const generateJWT = (userId: number, email: string, role: string): string => {
+  const jwtSecret: string = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+  const jwtExpiry: string = process.env.JWT_EXPIRY || '24h';
+  
+  return jwt.sign(
+    {
+      id: userId,
+      email,
+      role,
+    },
+    jwtSecret as string,
+    { expiresIn: jwtExpiry } as any
+  );
 };
 
 // Signup handler - collects email and account type
@@ -357,6 +374,8 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     }
 
     // Login successful
+    const token = generateJWT(user.id, user.email, user.role);
+    
     res.status(200).json({
       success: true,
       message: 'Login successful',
@@ -365,6 +384,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
         email: user.email,
         role: user.role,
         isVerified: user.is_verified,
+        token,
       },
     });
   } catch (error) {

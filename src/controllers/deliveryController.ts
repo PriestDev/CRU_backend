@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import pool from '../config/database';
+import { validateAbujaCampusRoute } from '../utils/area';
 
 const validDeliveryTypes = ['food', 'docs', 'other'] as const;
 type DeliveryType = (typeof validDeliveryTypes)[number];
@@ -49,6 +50,15 @@ export const createDelivery = async (req: Request, res: Response): Promise<void>
       res.status(400).json({
         success: false,
         message: 'pickupLocation and dropoffLocation are required',
+      });
+      return;
+    }
+
+    if (!validateAbujaCampusRoute([pickupLocation, dropoffLocation])) {
+      res.status(400).json({
+        success: false,
+        message:
+          'Delivery routes must be within Abuja Campus only. Please use pickup and dropoff locations that reference Abuja Campus.',
       });
       return;
     }
@@ -138,6 +148,70 @@ export const getDeliveries = async (req: Request, res: Response): Promise<void> 
     res.status(500).json({
       success: false,
       message: 'An error occurred while retrieving deliveries',
+      error: error instanceof Error ? error.message : 'Unknown error',
+    });
+  } finally {
+    connection.release();
+  }
+};
+
+export const updateDeliveryStatus = async (req: Request, res: Response): Promise<void> => {
+  const connection = await pool.getConnection();
+
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    if (!id || !status) {
+      res.status(400).json({
+        success: false,
+        message: 'Delivery ID and status are required',
+      });
+      return;
+    }
+
+    const validStatuses = ['pending', 'picked_up', 'in_transit', 'delivered', 'cancelled'];
+    if (!validStatuses.includes(status)) {
+      res.status(400).json({
+        success: false,
+        message: `Status must be one of: ${validStatuses.join(', ')}`,
+      });
+      return;
+    }
+
+    // Check if delivery exists
+    const [deliveries] = await connection.execute(
+      'SELECT id FROM deliveries WHERE id = ?',
+      [id]
+    );
+
+    if (!Array.isArray(deliveries) || deliveries.length === 0) {
+      res.status(404).json({
+        success: false,
+        message: 'Delivery not found',
+      });
+      return;
+    }
+
+    // Update delivery status
+    await connection.execute(
+      'UPDATE deliveries SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
+      [status, id]
+    );
+
+    res.status(200).json({
+      success: true,
+      message: 'Delivery status updated successfully',
+      data: {
+        deliveryId: id,
+        status,
+      },
+    });
+  } catch (error) {
+    console.error('Update delivery status error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'An error occurred while updating delivery status',
       error: error instanceof Error ? error.message : 'Unknown error',
     });
   } finally {
