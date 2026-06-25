@@ -397,7 +397,7 @@ export const getBookings = async (req: Request, res: Response): Promise<void> =>
   const connection = await pool.getConnection();
 
   try {
-    const userId = req.query.userId ? Number(req.query.userId) : null;
+    const userId = req.userId ?? (req.query.userId ? Number(req.query.userId) : null);
     const query = userId
       ? 'SELECT * FROM bookings WHERE user_id = ? ORDER BY created_at DESC'
       : 'SELECT * FROM bookings ORDER BY created_at DESC';

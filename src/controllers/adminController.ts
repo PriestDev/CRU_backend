@@ -1,10 +1,88 @@
 import { Request, Response } from 'express';
+import bcryptjs from 'bcryptjs';
 import pool from '../config/database';
 
 const toRole = (value: unknown) => {
   if (typeof value !== 'string') return null;
   const roles = ['student', 'staff', 'driver', 'visitor'];
   return roles.includes(value) ? value : null;
+};
+
+export const createAdminUser = async (req: Request, res: Response): Promise<void> => {
+  const connection = await pool.getConnection();
+
+  try {
+    const { email, full_name, password, role, is_verified } = req.body;
+    const requestedRole = toRole(role);
+
+    if (!email || !password || !requestedRole) {
+      res.status(400).json({
+        success: false,
+        message: 'Email, password, and role are required',
+      });
+      return;
+    }
+
+    if (!['staff', 'driver'].includes(requestedRole)) {
+      res.status(400).json({
+        success: false,
+        message: 'Only staff and driver accounts can be created from the admin panel',
+      });
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(String(email))) {
+      res.status(400).json({
+        success: false,
+        message: 'Invalid email format',
+      });
+      return;
+    }
+
+    const [existingRows] = await connection.execute('SELECT id FROM users WHERE email = ?', [email]);
+    if (Array.isArray(existingRows) && existingRows.length > 0) {
+      res.status(409).json({
+        success: false,
+        message: 'An account with this email already exists',
+      });
+      return;
+    }
+
+    const passwordHash = await bcryptjs.hash(String(password), 10);
+    const verified = typeof is_verified === 'boolean' ? is_verified : true;
+
+    const [result] = await connection.execute(
+      'INSERT INTO users (email, role, password_hash, full_name, is_verified) VALUES (?, ?, ?, ?, ?)',
+      [email, requestedRole, passwordHash, full_name || null, verified]
+    );
+
+    const insertedId = (result as any).insertId;
+
+    res.status(201).json({
+      success: true,
+      message: 'User created successfully',
+      data: {
+        user: {
+          id: insertedId,
+          name: full_name || email,
+          email,
+          role: requestedRole,
+          status: verified ? 'Active' : 'Pending',
+          createdAt: new Date().toISOString(),
+        },
+      },
+    });
+  } catch (error) {
+    console.error('Create admin user error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'An error occurred while creating the user',
+      error: error instanceof Error ? error.message : 'Unknown error',
+    });
+  } finally {
+    connection.release();
+  }
 };
 
 export const getAdminDashboardStats = async (_req: Request, res: Response): Promise<void> => {
@@ -228,6 +306,49 @@ export const getAdminTransactions = async (_req: Request, res: Response): Promis
     res.status(500).json({
       success: false,
       message: 'An error occurred while retrieving transactions',
+      error: error instanceof Error ? error.message : 'Unknown error',
+    });
+  } finally {
+    connection.release();
+  }
+};
+
+export const getAdminFleet = async (_req: Request, res: Response): Promise<void> => {
+  const connection = await pool.getConnection();
+
+  try {
+    const [rows] = await connection.execute(
+      `SELECT
+        id,
+        driver_name,
+        vehicle_type,
+        status,
+        created_at
+      FROM carpools
+      ORDER BY created_at DESC`
+    );
+
+    const vehicles = (rows as any[]).map((vehicle) => ({
+      id: vehicle.id,
+      vehicleId: `${vehicle.vehicle_type?.substring(0, 2).toUpperCase()}-${String(vehicle.id).padStart(3, '0')}`,
+      status: vehicle.status === 'open' ? 'EN ROUTE' : vehicle.status === 'closed' ? 'STANDBY' : 'MAINTENANCE',
+      driver: vehicle.driver_name || 'Automated',
+      vehicle: vehicle.vehicle_type || 'Unknown',
+      occupancy: Math.floor(Math.random() * 100),
+    }));
+
+    res.status(200).json({
+      success: true,
+      message: 'Fleet retrieved successfully',
+      data: {
+        vehicles,
+      },
+    });
+  } catch (error) {
+    console.error('Get admin fleet error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'An error occurred while retrieving fleet data',
       error: error instanceof Error ? error.message : 'Unknown error',
     });
   } finally {

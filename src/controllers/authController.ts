@@ -42,17 +42,17 @@ const getClientIP = (req: Request): string => {
 
 // Generate JWT token
 const generateJWT = (userId: number, email: string, role: string): string => {
-  const jwtSecret: string = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
-  const jwtExpiry: string = process.env.JWT_EXPIRY || '24h';
-  
+  const jwtSecret = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+  const jwtExpiry = process.env.JWT_EXPIRY || '24h';
+
   return jwt.sign(
     {
       id: userId,
       email,
       role,
     },
-    jwtSecret as string,
-    { expiresIn: jwtExpiry } as any
+    jwtSecret,
+    { expiresIn: jwtExpiry as jwt.SignOptions['expiresIn'] }
   );
 };
 

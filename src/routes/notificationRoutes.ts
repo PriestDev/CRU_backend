@@ -4,11 +4,12 @@ import {
   markNotificationAsRead,
   markAllNotificationsAsRead,
 } from '../controllers/notificationController';
+import { authMiddleware } from '../middleware/auth';
 
 const router = express.Router();
 
-router.get('/', getNotifications);
-router.put('/:id/read', markNotificationAsRead);
-router.put('/read-all', markAllNotificationsAsRead);
+router.get('/', authMiddleware, getNotifications);
+router.put('/:id/read', authMiddleware, markNotificationAsRead);
+router.put('/read-all', authMiddleware, markAllNotificationsAsRead);
 
 export default router;

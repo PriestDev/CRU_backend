@@ -1,6 +1,19 @@
 import { Request, Response } from 'express';
 import pool from '../config/database';
 
+const readNumberQueryParam = (value: unknown): number | null => {
+  if (typeof value === 'string') {
+    const parsed = Number.parseInt(value, 10);
+    return Number.isNaN(parsed) ? null : parsed;
+  }
+
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return value;
+  }
+
+  return null;
+};
+
 // Record ride location/tracking update
 export const recordTracking = async (req: Request, res: Response): Promise<void> => {
   const connection = await pool.getConnection();
@@ -82,9 +95,9 @@ export const getTracking = async (req: Request, res: Response): Promise<void> =>
   const connection = await pool.getConnection();
 
   try {
-    const bookingId = parseInt(req.query.bookingId as string, 10);
+    const bookingId = readNumberQueryParam(req.query.bookingId);
 
-    if (Number.isNaN(bookingId)) {
+    if (bookingId === null) {
       res.status(400).json({
         success: false,
         message: 'bookingId is required and must be a number',
@@ -161,9 +174,9 @@ export const getLatestLocation = async (req: Request, res: Response): Promise<vo
   const connection = await pool.getConnection();
 
   try {
-    const bookingId = parseInt(req.query.bookingId as string, 10);
+    const bookingId = readNumberQueryParam(req.query.bookingId);
 
-    if (Number.isNaN(bookingId)) {
+    if (bookingId === null) {
       res.status(400).json({
         success: false,
         message: 'bookingId is required and must be a number',

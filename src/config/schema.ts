@@ -1,4 +1,37 @@
+import bcryptjs from 'bcryptjs';
 import pool from './database';
+
+const ensureDefaultAdminUser = async (connection: any) => {
+  const adminEmail = process.env.DEFAULT_ADMIN_EMAIL?.trim() || 'admin@campusride.com';
+  const adminPassword = process.env.DEFAULT_ADMIN_PASSWORD?.trim() || 'Admin@123!';
+
+  const [existingAdmins] = await connection.execute(
+    'SELECT id FROM users WHERE role = ? LIMIT 1',
+    ['staff']
+  );
+
+  if (Array.isArray(existingAdmins) && existingAdmins.length > 0) {
+    return;
+  }
+
+  const passwordHash = await bcryptjs.hash(adminPassword, 10);
+
+  await connection.execute(
+    `
+      INSERT INTO users (
+        email,
+        role,
+        password_hash,
+        full_name,
+        is_verified,
+        ip_address
+      ) VALUES (?, ?, ?, ?, true, ?)
+    `,
+    [adminEmail, 'staff', passwordHash, 'System Administrator', '127.0.0.1']
+  );
+
+  console.log(`✅ Default admin account created: ${adminEmail}`);
+};
 
 export const initializeDB = async () => {
   const connection = await pool.getConnection();
@@ -69,6 +102,8 @@ export const initializeDB = async () => {
         throw error;
       }
     }
+
+    await ensureDefaultAdminUser(connection);
 
     // Create notifications table if it doesn't exist
     await connection.execute(`

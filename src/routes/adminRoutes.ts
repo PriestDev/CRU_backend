@@ -1,10 +1,12 @@
 import { Router } from 'express';
 import { authMiddleware, adminOnlyMiddleware } from '../middleware/auth';
 import {
+  createAdminUser,
   getAdminDashboardStats,
   getAdminUsers,
   getAdminBookings,
   getAdminTransactions,
+  getAdminFleet,
 } from '../controllers/adminController';
 
 const router = Router();
@@ -15,7 +17,9 @@ router.use(adminOnlyMiddleware);
 
 router.get('/dashboard', getAdminDashboardStats);
 router.get('/users', getAdminUsers);
+router.post('/users', createAdminUser);
 router.get('/bookings', getAdminBookings);
 router.get('/transactions', getAdminTransactions);
+router.get('/fleet', getAdminFleet);
 
 export default router;

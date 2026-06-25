@@ -5,11 +5,12 @@ import {
   updateBookingStatus,
   updateRideStartApproval,
 } from '../controllers/bookingController';
+import { optionalAuth } from '../middleware/auth';
 
 const router = Router();
 
 router.post('/', createBooking);
-router.get('/', getBookings);
+router.get('/', optionalAuth, getBookings);
 router.patch('/:id/status', updateBookingStatus);
 router.patch('/:id/start-approval', updateRideStartApproval);
 

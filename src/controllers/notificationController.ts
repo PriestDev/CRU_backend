@@ -12,6 +12,13 @@ type NotificationRow = {
   updated_at: string;
 };
 
+const getUserIdFromRequest = (req: Request): number | null => {
+  const queryUserId = toUserId(req.query.userId);
+  const authUserId = toUserId((req as any).userId);
+
+  return queryUserId || authUserId;
+};
+
 const toUserId = (value: unknown): number | null => {
   if (typeof value === 'number' && Number.isFinite(value) && value > 0) return value;
   if (typeof value === 'string') {
@@ -47,7 +54,7 @@ export const getNotifications = async (req: Request, res: Response): Promise<voi
   const connection = await pool.getConnection();
 
   try {
-    const userId = toUserId(req.query.userId);
+    const userId = getUserIdFromRequest(req);
     if (!userId) {
       res.status(401).json({ success: false, message: 'User authentication required' });
       return;
@@ -83,7 +90,7 @@ export const markNotificationAsRead = async (req: Request, res: Response): Promi
   const connection = await pool.getConnection();
 
   try {
-    const userId = toUserId(req.query.userId);
+    const userId = getUserIdFromRequest(req);
     const notificationId = Number(req.params.id);
 
     if (!userId) {
@@ -128,7 +135,7 @@ export const markAllNotificationsAsRead = async (req: Request, res: Response): P
   const connection = await pool.getConnection();
 
   try {
-    const userId = toUserId(req.query.userId);
+    const userId = getUserIdFromRequest(req);
 
     if (!userId) {
       res.status(401).json({ success: false, message: 'User authentication required' });

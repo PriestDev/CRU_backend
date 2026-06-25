@@ -55,6 +55,20 @@ npm run dev
 
 The API will be available at `http://localhost:5000`
 
+### Default Admin Account
+
+When the backend starts, it will automatically create a default admin account if no staff/admin account exists yet.
+
+Default login details:
+- Email: `admin@campusride.com`
+- Password: `Admin@123!`
+
+You can override these defaults by setting:
+```env
+DEFAULT_ADMIN_EMAIL=your-admin-email@example.com
+DEFAULT_ADMIN_PASSWORD=your-strong-password
+```
+
 ### Build
 
 Compile TypeScript:

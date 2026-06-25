@@ -1,6 +1,19 @@
 import { Request, Response } from 'express';
 import pool from '../config/database';
 
+const readNumberQueryParam = (value: unknown): number | null => {
+  if (typeof value === 'string') {
+    const parsed = Number.parseInt(value, 10);
+    return Number.isNaN(parsed) ? null : parsed;
+  }
+
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return value;
+  }
+
+  return null;
+};
+
 // Create or update ride rating
 export const createRating = async (req: Request, res: Response): Promise<void> => {
   const connection = await pool.getConnection();
@@ -86,9 +99,9 @@ export const getRatingByBooking = async (req: Request, res: Response): Promise<v
   const connection = await pool.getConnection();
 
   try {
-    const bookingId = parseInt(req.query.bookingId as string);
+    const bookingId = readNumberQueryParam(req.query.bookingId);
 
-    if (!bookingId) {
+    if (bookingId === null) {
       res.status(400).json({
         success: false,
         message: 'bookingId is required',
@@ -125,9 +138,9 @@ export const getRatingsByUser = async (req: Request, res: Response): Promise<voi
   const connection = await pool.getConnection();
 
   try {
-    const userId = parseInt(req.query.userId as string);
+    const userId = readNumberQueryParam(req.query.userId);
 
-    if (!userId) {
+    if (userId === null) {
       res.status(400).json({
         success: false,
         message: 'userId is required',
