@@ -423,12 +423,28 @@ export const initializeDB = async () => {
     }
 
     try {
-      await connection.execute(`
-        ALTER TABLE carpools
-        ADD CONSTRAINT fk_carpool_booking FOREIGN KEY (booking_id) REFERENCES bookings(id) ON DELETE SET NULL
+      const [fkRows] = await connection.execute(`
+        SELECT 1
+        FROM information_schema.KEY_COLUMN_USAGE
+        WHERE TABLE_SCHEMA = DATABASE()
+          AND TABLE_NAME = 'carpools'
+          AND CONSTRAINT_NAME = 'fk_carpool_booking'
+        LIMIT 1
       `);
+
+      if (!Array.isArray(fkRows) || fkRows.length === 0) {
+        await connection.execute(`
+          ALTER TABLE carpools
+          ADD CONSTRAINT fk_carpool_booking FOREIGN KEY (booking_id) REFERENCES bookings(id) ON DELETE SET NULL
+        `);
+      }
     } catch (error: any) {
-      if (error.code !== 'ER_DUP_KEYNAME' && error.code !== 'ER_CANNOT_ADD_FOREIGN' && error.code !== 'ER_CANT_CREATE_TABLE') {
+      if (
+        error.code !== 'ER_DUP_KEY' &&
+        error.code !== 'ER_DUP_KEYNAME' &&
+        error.code !== 'ER_CANNOT_ADD_FOREIGN' &&
+        error.code !== 'ER_CANT_CREATE_TABLE'
+      ) {
         throw error;
       }
     }
