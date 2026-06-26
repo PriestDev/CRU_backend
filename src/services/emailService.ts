@@ -1,6 +1,6 @@
 import nodemailer from 'nodemailer';
 import sgMail from '@sendgrid/mail';
-import { generateOTPEmail, generateWelcomeEmail, generatePasswordResetEmail } from './emailTemplates';
+import { generateOTPEmail, generateWelcomeEmail, generatePasswordResetEmail, getEmailAppUrl } from './emailTemplates';
 
 const sendgridApiKey = process.env.SENDGRID_API_KEY;
 const smtpUser = process.env.SMTP_USER || process.env.GMAIL_USER;
@@ -227,7 +227,7 @@ export const sendPasswordResetEmail = async ({
       to: email,
       subject: 'Campus Ride password reset request',
       html: htmlContent,
-      text: `Reset your password here: ${process.env.FRONTEND_URL || 'http://localhost:3000'}/reset-password?token=${resetToken}. This link expires in 30 minutes.`,
+      text: `Reset your password here: ${getEmailAppUrl(`/reset-password?token=${encodeURIComponent(resetToken)}`)}. This link expires in 30 minutes.`,
     };
 
     await sendEmail(mailOptions);

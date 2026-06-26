@@ -1,3 +1,25 @@
+export const getPublicBaseUrl = (): string => {
+  const configuredUrl = process.env.FRONTEND_URL
+    || process.env.PUBLIC_URL
+    || process.env.APP_URL
+    || process.env.BASE_URL
+    || process.env.CLIENT_URL
+    || process.env.NEXT_PUBLIC_APP_URL
+    || process.env.CORS_ORIGIN;
+
+  if (!configuredUrl) {
+    return 'https://campus-ride-uniport.vercel.app';
+  }
+
+  return configuredUrl.replace(/\/+$/, '');
+};
+
+export const getEmailAppUrl = (path = ''): string => {
+  const baseUrl = getPublicBaseUrl();
+  const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+  return `${baseUrl}${normalizedPath}`;
+};
+
 export const generateOTPEmail = (otp: string, userRole: string): string => {
   return `
     <!DOCTYPE html>
@@ -237,8 +259,8 @@ export const generateOTPEmail = (otp: string, userRole: string): string => {
           <p style="margin-top: 12px; font-size: 11px;">
             This email was sent because an account was created with this email address.
             <br>
-            <a href="https://campusride.uniport.edu/privacy" class="footer-link">Privacy Policy</a> | 
-            <a href="https://campusride.uniport.edu/terms" class="footer-link">Terms of Service</a>
+            <a href="${getEmailAppUrl('/privacy')}" class="footer-link">Privacy Policy</a> | 
+            <a href="${getEmailAppUrl('/terms')}" class="footer-link">Terms of Service</a>
           </p>
         </div>
       </div>
@@ -502,7 +524,7 @@ export const generateWelcomeEmail = (
             </ol>
           </div>
           
-          <a href="https://campusride.uniport.edu/login" class="cta-button">Go to Login Page</a>
+          <a href="${getEmailAppUrl('/login')}" class="cta-button">Go to Login Page</a>
           
           <hr class="divider" />
           
@@ -517,8 +539,8 @@ export const generateWelcomeEmail = (
           <p style="margin-top: 12px; font-size: 11px;">
             This email was sent because an account was created with this email address.
             <br>
-            <a href="https://campusride.uniport.edu/privacy" class="footer-link">Privacy Policy</a> | 
-            <a href="https://campusride.uniport.edu/terms" class="footer-link">Terms of Service</a>
+            <a href="${getEmailAppUrl('/privacy')}" class="footer-link">Privacy Policy</a> | 
+            <a href="${getEmailAppUrl('/terms')}" class="footer-link">Terms of Service</a>
           </p>
         </div>
       </div>
@@ -528,7 +550,7 @@ export const generateWelcomeEmail = (
 };
 
 export const generatePasswordResetEmail = (resetToken: string): string => {
-  const resetLink = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/reset-password?token=${resetToken}`;
+  const resetLink = getEmailAppUrl(`/reset-password?token=${encodeURIComponent(resetToken)}`);
   return `
     <!DOCTYPE html>
     <html>
