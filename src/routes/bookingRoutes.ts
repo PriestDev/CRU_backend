@@ -3,15 +3,17 @@ import {
   createBooking,
   getBookings,
   updateBookingStatus,
+  updateRideCompletionApproval,
   updateRideStartApproval,
 } from '../controllers/bookingController';
-import { optionalAuth } from '../middleware/auth';
+import { authMiddleware, optionalAuth } from '../middleware/auth';
 
 const router = Router();
 
 router.post('/', createBooking);
 router.get('/', optionalAuth, getBookings);
-router.patch('/:id/status', updateBookingStatus);
-router.patch('/:id/start-approval', updateRideStartApproval);
+router.patch('/:id/status', authMiddleware, updateBookingStatus);
+router.patch('/:id/complete-approval', authMiddleware, updateRideCompletionApproval);
+router.patch('/:id/start-approval', authMiddleware, updateRideStartApproval);
 
 export default router;

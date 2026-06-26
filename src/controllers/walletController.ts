@@ -99,6 +99,70 @@ const mapTransaction = (transaction: WalletTransactionRow) => ({
   description: transaction.description,
 });
 
+export const creditWalletForRideCompletion = async (
+  connection: any,
+  userId: number,
+  amount: number,
+  bookingId?: number,
+) => {
+  if (!Number.isFinite(amount) || amount <= 0) {
+    return {
+      credited: false,
+      wallet: null,
+      transactionId: null,
+      reference: null,
+    };
+  }
+
+  const wallet = await getOrCreateWallet(connection, userId);
+  const balanceBefore = Number(wallet.balance);
+  const balanceAfter = balanceBefore + amount;
+  const reference = createReference('RIDE');
+
+  await connection.execute(
+    `UPDATE wallet_accounts SET balance = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
+    [balanceAfter, wallet.id],
+  );
+
+  const transactionResult = await connection.execute(
+    `INSERT INTO wallet_transactions (
+      wallet_account_id,
+      user_id,
+      transaction_type,
+      amount,
+      balance_before,
+      balance_after,
+      reference,
+      description,
+      status,
+      metadata
+    ) VALUES (?, ?, 'fund', ?, ?, ?, ?, ?, 'completed', ?)`,
+    [
+      wallet.id,
+      userId,
+      amount,
+      balanceBefore,
+      balanceAfter,
+      reference,
+      bookingId ? `Ride payout for booking #${bookingId}` : 'Ride payout',
+      JSON.stringify({ source: 'ride_completion', bookingId: bookingId ?? null }),
+    ],
+  );
+
+  const meta = Array.isArray(transactionResult) ? transactionResult[0] : transactionResult;
+  const transactionId = (meta as any).insertId;
+
+  return {
+    credited: true,
+    wallet: {
+      ...wallet,
+      balance: balanceAfter,
+    },
+    transactionId,
+    reference,
+  };
+};
+
 export const getWallet = async (req: Request, res: Response): Promise<void> => {
   const connection = await pool.getConnection();
 

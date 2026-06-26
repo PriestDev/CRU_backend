@@ -326,27 +326,43 @@ export const login = async (req: Request, res: Response): Promise<void> => {
   const connection = await pool.getConnection();
   
   try {
-    const { email, password } = req.body;
+    const { email, password, staffId, phoneNumber, credential, riderId, rider_id } = req.body;
+    const emailCredential = typeof email === 'string' ? email.trim() : '';
+    const credentialValue = typeof credential === 'string' ? credential.trim() : '';
+    const riderCredential = typeof riderId === 'string' ? riderId.trim() : typeof rider_id === 'string' ? rider_id.trim() : '';
+    const phoneCredential = typeof phoneNumber === 'string' ? phoneNumber.trim() : '';
+    const searchValue = credentialValue || riderCredential || phoneCredential || emailCredential;
 
     // Validate inputs
-    if (!email || !password) {
+    if (!password || (!searchValue && !staffId)) {
       res.status(400).json({
         success: false,
-        message: 'Email and password are required',
+        message: 'Rider ID, phone number, or staff ID and password are required',
       });
       return;
     }
 
-    // Find user by email
-    const [users] = await connection.execute(
-      'SELECT * FROM users WHERE email = ?',
-      [email]
-    );
+    let users: any[] = [];
+
+    if (searchValue) {
+      const numericSearchValue = /^\d+$/.test(searchValue) ? Number(searchValue) : null;
+      const [emailUsers] = await connection.execute(
+        'SELECT * FROM users WHERE email = ? OR campus_id = ? OR rider_id = ? OR phone_number = ? OR id = ? LIMIT 1',
+        [searchValue, searchValue, searchValue, searchValue, numericSearchValue ?? -1]
+      );
+      users = Array.isArray(emailUsers) ? (emailUsers as any[]) : [];
+    } else if (staffId) {
+      const [staffUsers] = await connection.execute(
+        'SELECT * FROM users WHERE campus_id = ? OR email = ? LIMIT 1',
+        [staffId, staffId]
+      );
+      users = Array.isArray(staffUsers) ? (staffUsers as any[]) : [];
+    }
 
     if (!Array.isArray(users) || users.length === 0) {
       res.status(404).json({
         success: false,
-        message: 'Email or password is incorrect',
+        message: 'Rider credentials or password is incorrect',
       });
       return;
     }
@@ -368,7 +384,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     if (!isPasswordValid) {
       res.status(401).json({
         success: false,
-        message: 'Email or password is incorrect',
+        message: 'Rider credentials or password is incorrect',
       });
       return;
     }

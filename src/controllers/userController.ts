@@ -17,7 +17,7 @@ export const getUserById = async (req: Request, res: Response): Promise<void> =>
     }
 
     const [rows] = await connection.execute(
-      'SELECT id, email, full_name, phone_number, campus_id FROM users WHERE id = ?',
+      'SELECT id, email, full_name, phone_number, campus_id, vehicle_model, vehicle_plate_number FROM users WHERE id = ?',
       [userId],
     );
 
@@ -42,6 +42,8 @@ export const getUserById = async (req: Request, res: Response): Promise<void> =>
         name: name || null,
         phoneNumber: user.phone_number || null,
         campusId: user.campus_id || null,
+        vehicleModel: user.vehicle_model || null,
+        vehiclePlateNumber: user.vehicle_plate_number || null,
       },
     });
   } catch (error) {

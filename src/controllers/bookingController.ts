@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import pool from '../config/database';
 import { validateAbujaCampusRoute } from '../utils/area';
+import { creditWalletForRideCompletion } from './walletController';
 
 const sendRideStartNotification = async (
   connection: any,
@@ -20,7 +21,29 @@ const sendRideStartNotification = async (
   await connection.execute(
     `INSERT INTO notifications (user_id, title, message, type, is_read)
      VALUES (?, ?, ?, 'ride', false)`,
-    [passengerUserId, 'Ride start request', message,],
+    [passengerUserId, 'Ride start request', message],
+  );
+};
+
+const sendRideCompletionNotification = async (
+  connection: any,
+  bookingId: number,
+  riderId: number,
+  message: string,
+) => {
+  const [bookingRows] = await connection.execute(
+    'SELECT user_id FROM bookings WHERE id = ?',
+    [bookingId],
+  );
+  const booking = Array.isArray(bookingRows) && bookingRows.length > 0 ? bookingRows[0] as any : null;
+  const passengerUserId = booking?.user_id;
+
+  if (!passengerUserId || passengerUserId === riderId) return;
+
+  await connection.execute(
+    `INSERT INTO notifications (user_id, title, message, type, is_read)
+     VALUES (?, ?, ?, 'ride', false)`,
+    [passengerUserId, 'Ride completion request', message],
   );
 };
 
@@ -438,6 +461,68 @@ export const updateBookingStatus = async (req: Request, res: Response): Promise<
       return;
     }
 
+    if (status === 'completion_requested') {
+      const [bookingRows] = await connection.execute(
+        'SELECT user_id, status, completion_request_status FROM bookings WHERE id = ?',
+        [bookingId],
+      );
+      const booking = Array.isArray(bookingRows) && bookingRows.length > 0 ? bookingRows[0] as any : null;
+
+      if (!booking) {
+        res.status(404).json({
+          success: false,
+          message: 'Booking not found',
+        });
+        return;
+      }
+
+      if (booking.status !== 'in_progress') {
+        res.status(400).json({
+          success: false,
+          message: 'Only rides in progress can request completion.',
+        });
+        return;
+      }
+
+      if (booking.completion_request_status === 'requested') {
+        res.status(200).json({
+          success: true,
+          message: 'Completion approval is already pending.',
+          data: {
+            bookingId,
+            status: 'in_progress',
+            completionRequestStatus: 'requested',
+          },
+        });
+        return;
+      }
+
+      await connection.execute(
+        `UPDATE bookings
+         SET completion_request_status = 'requested', rider_id = COALESCE(rider_id, ?)
+         WHERE id = ?`,
+        [(req as any).userId ? Number((req as any).userId) : null, bookingId],
+      );
+
+      await sendRideCompletionNotification(
+        connection,
+        bookingId,
+        Number(booking.user_id),
+        'The rider has requested to complete this trip. Please approve the ride completion.',
+      );
+
+      res.status(200).json({
+        success: true,
+        message: 'Completion request sent to the passenger. Waiting for approval.',
+        data: {
+          bookingId,
+          status: 'in_progress',
+          completionRequestStatus: 'requested',
+        },
+      });
+      return;
+    }
+
     const validStatuses = ['pending', 'confirmed', 'in_progress', 'completed', 'cancelled'];
     if (!validStatuses.includes(status)) {
       res.status(400).json({
@@ -448,7 +533,7 @@ export const updateBookingStatus = async (req: Request, res: Response): Promise<
     }
 
     const [bookingRows] = await connection.execute(
-      'SELECT user_id, status, start_request_status FROM bookings WHERE id = ?',
+      'SELECT user_id, status, start_request_status, completion_request_status FROM bookings WHERE id = ?',
       [bookingId],
     );
     const booking = Array.isArray(bookingRows) && bookingRows.length > 0 ? bookingRows[0] as any : null;
@@ -464,7 +549,7 @@ export const updateBookingStatus = async (req: Request, res: Response): Promise<
     if (status === 'in_progress') {
       await connection.execute(
         `UPDATE bookings
-         SET status = 'in_progress', start_request_status = 'requested', started_at = NULL
+         SET status = 'in_progress', start_request_status = 'requested', completion_request_status = 'idle', started_at = NULL
          WHERE id = ?`,
         [bookingId],
       );
@@ -491,9 +576,17 @@ export const updateBookingStatus = async (req: Request, res: Response): Promise<
     const updateValues: any[] = [status];
 
     if (status === 'completed') {
-      updateQuery += ', start_request_status = CASE WHEN start_request_status = "requested" THEN "approved" ELSE start_request_status END, started_at = COALESCE(started_at, CURRENT_TIMESTAMP)';
+      if (booking.completion_request_status !== 'approved') {
+        res.status(400).json({
+          success: false,
+          message: 'Ride completion requires passenger approval.',
+        });
+        return;
+      }
+
+      updateQuery += ', start_request_status = CASE WHEN start_request_status = "requested" THEN "approved" ELSE start_request_status END, completion_request_status = "approved", started_at = COALESCE(started_at, CURRENT_TIMESTAMP), completed_at = COALESCE(completed_at, CURRENT_TIMESTAMP)';
     } else if (status === 'cancelled') {
-      updateQuery += ', start_request_status = "rejected"';
+      updateQuery += ', start_request_status = "rejected", completion_request_status = "rejected"';
     }
 
     updateQuery += ' WHERE id = ?';
@@ -533,6 +626,117 @@ export const updateBookingStatus = async (req: Request, res: Response): Promise<
     res.status(500).json({
       success: false,
       message: 'An error occurred while updating booking status',
+      error: error instanceof Error ? error.message : 'Unknown error',
+    });
+  } finally {
+    connection.release();
+  }
+};
+
+export const updateRideCompletionApproval = async (req: Request, res: Response): Promise<void> => {
+  const connection = await pool.getConnection();
+
+  try {
+    const bookingId = Number(req.params.id);
+    const { userId, approved } = req.body;
+
+    if (!Number.isFinite(bookingId)) {
+      res.status(400).json({
+        success: false,
+        message: 'A valid booking ID is required',
+      });
+      return;
+    }
+
+    if (!Number.isFinite(Number(userId))) {
+      res.status(400).json({
+        success: false,
+        message: 'A valid user ID is required',
+      });
+      return;
+    }
+
+    const [bookingRows] = await connection.execute(
+      'SELECT user_id, rider_id, status, completion_request_status, estimated_price FROM bookings WHERE id = ?',
+      [bookingId],
+    );
+    const booking = Array.isArray(bookingRows) && bookingRows.length > 0 ? bookingRows[0] as any : null;
+
+    if (!booking) {
+      res.status(404).json({
+        success: false,
+        message: 'Booking not found',
+      });
+      return;
+    }
+
+    if (Number(userId) !== Number(booking.user_id)) {
+      res.status(403).json({
+        success: false,
+        message: 'Only the passenger can approve this ride completion request',
+      });
+      return;
+    }
+
+    if (booking.status !== 'in_progress' || booking.completion_request_status !== 'requested') {
+      res.status(400).json({
+        success: false,
+        message: 'No pending ride completion approval found for this booking',
+      });
+      return;
+    }
+
+    await connection.beginTransaction();
+
+    if (approved) {
+      await connection.execute(
+        `UPDATE bookings
+         SET status = 'completed', completion_request_status = 'approved', completed_at = COALESCE(completed_at, CURRENT_TIMESTAMP)
+         WHERE id = ?`,
+        [bookingId],
+      );
+
+      const payoutUserId = Number(booking.rider_id || 0);
+      if (payoutUserId > 0) {
+        await creditWalletForRideCompletion(
+          connection,
+          payoutUserId,
+          Number(booking.estimated_price || 0),
+          bookingId,
+        );
+      }
+    } else {
+      await connection.execute(
+        `UPDATE bookings
+         SET completion_request_status = 'rejected'
+         WHERE id = ?`,
+        [bookingId],
+      );
+    }
+
+    await connection.commit();
+
+    res.status(200).json({
+      success: true,
+      message: approved
+        ? 'Ride completion approved successfully. Rider earnings have been credited.'
+        : 'Ride completion request rejected.',
+      data: {
+        bookingId,
+        approved,
+      },
+    });
+  } catch (error) {
+    try {
+      await connection.rollback();
+    } catch {
+      // ignore rollback errors
+    }
+
+    console.error('Update ride completion approval error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'An error occurred while updating ride completion approval',
       error: error instanceof Error ? error.message : 'Unknown error',
     });
   } finally {

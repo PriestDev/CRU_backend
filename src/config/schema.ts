@@ -5,12 +5,46 @@ const ensureDefaultAdminUser = async (connection: any) => {
   const adminEmail = process.env.DEFAULT_ADMIN_EMAIL?.trim() || 'admin@campusride.com';
   const adminPassword = process.env.DEFAULT_ADMIN_PASSWORD?.trim() || 'Admin@123!';
 
-  const [existingAdmins] = await connection.execute(
-    'SELECT id FROM users WHERE role = ? LIMIT 1',
-    ['staff']
+  const [existingAdminRows] = await connection.execute(
+    'SELECT id, email, password_hash, is_verified FROM users WHERE email = ? OR role = ? ORDER BY id ASC',
+    [adminEmail, 'staff']
   );
 
-  if (Array.isArray(existingAdmins) && existingAdmins.length > 0) {
+  const adminRows = Array.isArray(existingAdminRows) ? (existingAdminRows as any[]) : [];
+  const existingAdmin = adminRows.find((row) => row.email === adminEmail) || adminRows[0];
+
+  if (existingAdmin) {
+    if (existingAdmin.email !== adminEmail) {
+      const [emailConflictRows] = await connection.execute(
+        'SELECT id FROM users WHERE email = ? AND id != ? LIMIT 1',
+        [adminEmail, existingAdmin.id]
+      );
+
+      if (!Array.isArray(emailConflictRows) || emailConflictRows.length === 0) {
+        await connection.execute(
+          'UPDATE users SET email = ?, is_verified = true, role = ? WHERE id = ?',
+          [adminEmail, 'staff', existingAdmin.id]
+        );
+        console.log(`✅ Existing staff account promoted to admin: ${adminEmail}`);
+      } else {
+        await connection.execute(
+          'UPDATE users SET is_verified = true, role = ? WHERE id = ?',
+          ['staff', existingAdmin.id]
+        );
+      }
+    } else if (!existingAdmin.is_verified) {
+      await connection.execute(
+        'UPDATE users SET is_verified = true WHERE id = ?',
+        [existingAdmin.id]
+      );
+    }
+
+    const passwordHash = await bcryptjs.hash(adminPassword, 10);
+    await connection.execute(
+      'UPDATE users SET password_hash = ? WHERE id = ?',
+      [passwordHash, existingAdmin.id]
+    );
+
     return;
   }
 
@@ -47,6 +81,9 @@ export const initializeDB = async () => {
         full_name VARCHAR(255) DEFAULT NULL,
         phone_number VARCHAR(50) DEFAULT NULL,
         campus_id VARCHAR(100) DEFAULT NULL,
+        rider_id VARCHAR(100) DEFAULT NULL,
+        vehicle_model VARCHAR(100) DEFAULT NULL,
+        vehicle_plate_number VARCHAR(50) DEFAULT NULL,
         profile_picture_url VARCHAR(255) DEFAULT NULL,
         address TEXT DEFAULT NULL,
         is_verified BOOLEAN DEFAULT false,
@@ -67,6 +104,9 @@ export const initializeDB = async () => {
       { name: 'full_name', definition: 'VARCHAR(255) DEFAULT NULL' },
       { name: 'phone_number', definition: 'VARCHAR(50) DEFAULT NULL' },
       { name: 'campus_id', definition: 'VARCHAR(100) DEFAULT NULL' },
+      { name: 'rider_id', definition: 'VARCHAR(100) DEFAULT NULL' },
+      { name: 'vehicle_model', definition: 'VARCHAR(100) DEFAULT NULL' },
+      { name: 'vehicle_plate_number', definition: 'VARCHAR(50) DEFAULT NULL' },
       { name: 'profile_picture_url', definition: 'VARCHAR(255) DEFAULT NULL' },
       { name: 'address', definition: 'TEXT DEFAULT NULL' },
     ];
@@ -159,6 +199,7 @@ export const initializeDB = async () => {
       CREATE TABLE IF NOT EXISTS bookings (
         id INT AUTO_INCREMENT PRIMARY KEY,
         user_id INT NOT NULL,
+        rider_id INT DEFAULT NULL,
         booking_type ENUM('oneWay', 'roundTrip', 'multiStop', 'schedule') NOT NULL,
         ride_option ENUM('standard', 'carpool') NOT NULL DEFAULT 'standard',
         passengers INT NOT NULL DEFAULT 1,
@@ -174,7 +215,9 @@ export const initializeDB = async () => {
         payment_status ENUM('pending', 'paid', 'failed', 'refunded') NOT NULL DEFAULT 'pending',
         status ENUM('pending', 'confirmed', 'in_progress', 'completed', 'cancelled') NOT NULL DEFAULT 'pending',
         start_request_status ENUM('idle', 'requested', 'approved', 'rejected') NOT NULL DEFAULT 'idle',
+        completion_request_status ENUM('idle', 'requested', 'approved', 'rejected') NOT NULL DEFAULT 'idle',
         started_at DATETIME DEFAULT NULL,
+        completed_at DATETIME DEFAULT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         INDEX idx_booking_user (user_id),
@@ -208,6 +251,39 @@ export const initializeDB = async () => {
       await connection.execute(`
         ALTER TABLE bookings
         ADD COLUMN started_at DATETIME DEFAULT NULL
+      `);
+    } catch (error: any) {
+      if (error.code !== 'ER_DUP_FIELDNAME') {
+        throw error;
+      }
+    }
+
+    try {
+      await connection.execute(`
+        ALTER TABLE bookings
+        ADD COLUMN rider_id INT DEFAULT NULL
+      `);
+    } catch (error: any) {
+      if (error.code !== 'ER_DUP_FIELDNAME') {
+        throw error;
+      }
+    }
+
+    try {
+      await connection.execute(`
+        ALTER TABLE bookings
+        ADD COLUMN completion_request_status ENUM('idle', 'requested', 'approved', 'rejected') NOT NULL DEFAULT 'idle'
+      `);
+    } catch (error: any) {
+      if (error.code !== 'ER_DUP_FIELDNAME') {
+        throw error;
+      }
+    }
+
+    try {
+      await connection.execute(`
+        ALTER TABLE bookings
+        ADD COLUMN completed_at DATETIME DEFAULT NULL
       `);
     } catch (error: any) {
       if (error.code !== 'ER_DUP_FIELDNAME') {
